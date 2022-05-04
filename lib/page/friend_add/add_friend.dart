@@ -142,7 +142,6 @@ class _AddFriendPageState extends State<AddFriendPage>
                   isShow == true
                       ? InkWell(
                           onTap: () {
-                            print("失去焦点");
                             textEditingController.clear();
                             inputValue = "";
                             FocusScope.of(context).unfocus();

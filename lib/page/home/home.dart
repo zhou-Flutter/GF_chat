@@ -99,7 +99,6 @@ class _HomeState extends State<Home> {
   _onRefresh() {
     //下拉刷新
     Provider.of<Chat>(context, listen: false).getConversationList();
-    print("下拉刷新");
     _refreshController.refreshCompleted();
   }
 

@@ -12,6 +12,7 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:my_chat/config/routes/application.dart';
 import 'package:my_chat/main.dart';
 import 'package:my_chat/provider/init_im_sdk_provider.dart';
+import 'package:my_chat/provider/trtc_provider.dart';
 import 'package:provider/provider.dart';
 
 class Communal extends StatefulWidget {
@@ -42,13 +43,7 @@ class _CommunalState extends State<Communal> {
         children: [
           InkWell(
             onTap: () {
-              // Provider.of<InitIMSDKProvider>(context, listen: false)
-              //     .showfloat();
-              Application.router.navigateTo(
-                MyChatApp.navigatorKey.currentState!.context,
-                "/voiceCallPage",
-                transition: TransitionType.inFromRight,
-              );
+              Provider.of<Trtc>(context, listen: false).floatOpen();
             },
             child: Text(
               "你好",
@@ -58,10 +53,7 @@ class _CommunalState extends State<Communal> {
             ),
           ),
           InkWell(
-            onTap: () {
-              Provider.of<InitIMSDKProvider>(context, listen: false)
-                  .floatclose();
-            },
+            onTap: () {},
             child: Text(
               "你好",
               style: TextStyle(

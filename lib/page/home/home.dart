@@ -123,56 +123,7 @@ class _HomeState extends State<Home> {
               ),
               padding: EdgeInsets.symmetric(horizontal: 35.r),
             ),
-            menuBuilder: () => ClipRRect(
-              borderRadius: BorderRadius.circular(15.r),
-              child: Container(
-                color: const Color(0xFF4C4C4C),
-                child: IntrinsicWidth(
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.stretch,
-                    children: menuItems
-                        .map(
-                          (item) => GestureDetector(
-                            behavior: HitTestBehavior.translucent,
-                            onTap: () {
-                              _menuToPage(item.title);
-                              _controller.hideMenu();
-                            },
-                            child: Container(
-                              height: 80.h,
-                              padding: EdgeInsets.symmetric(horizontal: 40.r),
-                              child: Row(
-                                children: <Widget>[
-                                  Icon(
-                                    item.icon,
-                                    size: 40.r,
-                                    color: Colors.white,
-                                  ),
-                                  Expanded(
-                                    child: Container(
-                                      margin: EdgeInsets.only(
-                                          left: 20.r, right: 20.r),
-                                      padding:
-                                          EdgeInsets.symmetric(vertical: 20.r),
-                                      child: Text(
-                                        item.title,
-                                        style: TextStyle(
-                                          color: Colors.white,
-                                          fontSize: 28.sp,
-                                        ),
-                                      ),
-                                    ),
-                                  ),
-                                ],
-                              ),
-                            ),
-                          ),
-                        )
-                        .toList(),
-                  ),
-                ),
-              ),
-            ),
+            menuBuilder: () => popupMenu(),
             pressType: PressType.singleClick,
             verticalMargin: -10,
             controller: _controller,
@@ -192,13 +143,67 @@ class _HomeState extends State<Home> {
                     physics: NeverScrollableScrollPhysics(),
                     itemBuilder: (context, index) {
                       return chatView(currentMessageList[index]);
-                    })
+                    },
+                  ),
           ],
         ),
       ),
     );
   }
 
+  //弹出菜单
+  Widget popupMenu() {
+    return ClipRRect(
+      borderRadius: BorderRadius.circular(15.r),
+      child: Container(
+        color: const Color(0xFF4C4C4C),
+        child: IntrinsicWidth(
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.stretch,
+            children: menuItems
+                .map(
+                  (item) => GestureDetector(
+                    behavior: HitTestBehavior.translucent,
+                    onTap: () {
+                      _menuToPage(item.title);
+                      _controller.hideMenu();
+                    },
+                    child: Container(
+                      height: 80.h,
+                      padding: EdgeInsets.symmetric(horizontal: 40.r),
+                      child: Row(
+                        children: <Widget>[
+                          Icon(
+                            item.icon,
+                            size: 40.r,
+                            color: Colors.white,
+                          ),
+                          Expanded(
+                            child: Container(
+                              margin: EdgeInsets.only(left: 20.r, right: 20.r),
+                              padding: EdgeInsets.symmetric(vertical: 20.r),
+                              child: Text(
+                                item.title,
+                                style: TextStyle(
+                                  color: Colors.white,
+                                  fontSize: 28.sp,
+                                ),
+                              ),
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ),
+                )
+                .toList(),
+          ),
+        ),
+      ),
+    );
+  }
+
+  //暂无会话
   Widget noCurrent() {
     return Container(
       padding: EdgeInsets.only(top: 300.r),
@@ -263,11 +268,156 @@ class _HomeState extends State<Home> {
     var time = item.lastMessage!.timestamp;
     var recvOpt = item.recvOpt;
     var createTime = RelativeDateFormat.timeToBefore(time!);
-    var elemType = item.lastMessage!.elemType;
+
+    return SliderItem(
+      isPinned: item.isPinned!,
+      key: UniqueKey(),
+      onTap: () {
+        onTap(item);
+      },
+      child: Container(
+        padding: EdgeInsets.symmetric(horizontal: 25.r),
+        child: Row(
+          children: [
+            Container(
+              padding: EdgeInsets.only(right: 20.r),
+              child: Avatar(
+                size: 95.r,
+                isSelf: false,
+                faceUrl: item.faceUrl,
+              ),
+            ),
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Container(
+                    child: Text(
+                      "${item.showName}",
+                      overflow: TextOverflow.ellipsis,
+                      style: TextStyle(
+                        fontSize: 35.sp,
+                      ),
+                    ),
+                  ),
+                  SizedBox(
+                    height: 5.h,
+                  ),
+                  msgStatus(item.lastMessage!)
+                ],
+              ),
+            ),
+            Container(
+              padding: EdgeInsets.all(20.r),
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Text(
+                    "${createTime}",
+                    style: TextStyle(
+                      fontSize: 20.sp,
+                      color: Colors.black26,
+                      fontWeight: FontWeight.w500,
+                    ),
+                  ),
+                  SizedBox(
+                    height: 10.h,
+                  ),
+                  item.unreadCount == 0
+                      ? Container()
+                      : Container(
+                          width: 30.r,
+                          height: 30.r,
+                          alignment: Alignment.center,
+                          decoration: BoxDecoration(
+                            color: Colors.red,
+                            borderRadius: BorderRadius.circular(50.r),
+                          ),
+                          child: Text(
+                            "${item.unreadCount}",
+                            style: TextStyle(
+                              color: Colors.white,
+                              fontSize: 20.sp,
+                            ),
+                          ),
+                        ),
+                ],
+              ),
+            )
+          ],
+        ),
+      ),
+      toppingChild: item.isPinned == true
+          ? Expanded(
+              flex: 3,
+              child: InkWell(
+                onTap: () {
+                  Provider.of<Chat>(context, listen: false)
+                      .pinConversation(item.conversationID, false);
+                },
+                child: Container(
+                  alignment: Alignment.center,
+                  color: Colors.blue,
+                  padding: EdgeInsets.symmetric(horizontal: 10.r),
+                  child: Text(
+                    "取消置顶",
+                    style: TextStyle(
+                      fontSize: 30.sp,
+                      color: Colors.white,
+                    ),
+                  ),
+                ),
+              ),
+            )
+          : Expanded(
+              flex: 2,
+              child: InkWell(
+                onTap: () {
+                  Provider.of<Chat>(context, listen: false)
+                      .pinConversation(item.conversationID, true);
+                },
+                child: Container(
+                  alignment: Alignment.center,
+                  color: Colors.blue,
+                  child: Text(
+                    "置顶",
+                    style: TextStyle(
+                      fontSize: 30.sp,
+                      color: Colors.white,
+                    ),
+                  ),
+                ),
+              )),
+      deleteChild: Expanded(
+        flex: 2,
+        child: InkWell(
+          onTap: () {
+            Provider.of<Chat>(context, listen: false)
+                .deleteConversation(item.conversationID);
+          },
+          child: Container(
+            alignment: Alignment.center,
+            color: Colors.red,
+            child: Text(
+              "删除",
+              style: TextStyle(
+                fontSize: 30.sp,
+                color: Colors.white,
+              ),
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+
+  //消息状态
+  Widget msgStatus(V2TimMessage v2timMsg) {
     var lastmsg = "";
-    switch (elemType) {
+    switch (v2timMsg.elemType) {
       case MessageElemType.V2TIM_ELEM_TYPE_TEXT:
-        lastmsg = item.lastMessage!.textElem!.text!;
+        lastmsg = v2timMsg.textElem!.text!;
         break;
       case MessageElemType.V2TIM_ELEM_TYPE_CUSTOM:
         lastmsg = "[自定义消息]";
@@ -289,159 +439,82 @@ class _HomeState extends State<Home> {
         break;
       default:
     }
-
-    return Container(
-      child: SliderItem(
-        isPinned: item.isPinned!,
-        key: UniqueKey(),
-        onTap: () {
-          onTap(item);
-        },
-        child: Container(
-          padding: EdgeInsets.symmetric(horizontal: 25.r),
-          child: Row(
-            children: [
-              Container(
-                padding: EdgeInsets.only(right: 20.r),
-                child: Avatar(
-                  size: 95.r,
-                  isSelf: false,
-                  faceUrl: item.faceUrl,
+    switch (v2timMsg.status) {
+      case 0:
+        return Row(
+          children: [
+            Container(
+              child: Text(
+                "[发送中]",
+                style: TextStyle(
+                  color: Colors.black,
+                  fontSize: 25.sp,
                 ),
               ),
-              Expanded(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    Container(
-                      child: Text(
-                        "${item.showName}",
-                        overflow: TextOverflow.ellipsis,
-                        style: TextStyle(
-                          fontSize: 35.sp,
-                        ),
-                      ),
-                    ),
-                    SizedBox(
-                      height: 5.h,
-                    ),
-                    Container(
-                      child: Text(
-                        "${lastmsg}",
-                        maxLines: 1,
-                        overflow: TextOverflow.ellipsis,
-                        style: TextStyle(
-                          color: Colors.black45,
-                          fontSize: 25.sp,
-                        ),
-                      ),
-                    )
-                  ],
+            ),
+            Container(
+              child: Text(
+                "${lastmsg}",
+                maxLines: 1,
+                overflow: TextOverflow.ellipsis,
+                style: TextStyle(
+                  color: Colors.black45,
+                  fontSize: 25.sp,
                 ),
               ),
-              Container(
-                padding: EdgeInsets.all(20.r),
-                child: Column(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    Text(
-                      "${createTime}",
-                      style: TextStyle(
-                        fontSize: 20.sp,
-                        color: Colors.black26,
-                        fontWeight: FontWeight.w500,
-                      ),
-                    ),
-                    SizedBox(
-                      height: 10.h,
-                    ),
-                    item.unreadCount == 0
-                        ? Container()
-                        : Container(
-                            width: 30.r,
-                            height: 30.r,
-                            alignment: Alignment.center,
-                            decoration: BoxDecoration(
-                              color: Colors.red,
-                              borderRadius: BorderRadius.circular(50.r),
-                            ),
-                            child: Text(
-                              "${item.unreadCount}",
-                              style: TextStyle(
-                                color: Colors.white,
-                                fontSize: 20.sp,
-                              ),
-                            ),
-                          ),
-                  ],
-                ),
-              )
-            ],
+            )
+          ],
+        );
+      case 2:
+        return Container(
+          child: Text(
+            "${lastmsg}",
+            maxLines: 1,
+            overflow: TextOverflow.ellipsis,
+            style: TextStyle(
+              color: Colors.black45,
+              fontSize: 25.sp,
+            ),
           ),
-        ),
-        toppingChild: item.isPinned == true
-            ? Expanded(
-                flex: 3,
-                child: InkWell(
-                  onTap: () {
-                    Provider.of<Chat>(context, listen: false)
-                        .pinConversation(item.conversationID, false);
-                  },
-                  child: Container(
-                    alignment: Alignment.center,
-                    color: Colors.blue,
-                    padding: EdgeInsets.symmetric(horizontal: 10.r),
-                    child: Text(
-                      "取消置顶",
-                      style: TextStyle(
-                        fontSize: 30.sp,
-                        color: Colors.white,
-                      ),
-                    ),
-                  ),
-                ),
-              )
-            : Expanded(
-                flex: 2,
-                child: InkWell(
-                  onTap: () {
-                    Provider.of<Chat>(context, listen: false)
-                        .pinConversation(item.conversationID, true);
-                  },
-                  child: Container(
-                    alignment: Alignment.center,
-                    color: Colors.blue,
-                    child: Text(
-                      "置顶",
-                      style: TextStyle(
-                        fontSize: 30.sp,
-                        color: Colors.white,
-                      ),
-                    ),
-                  ),
-                )),
-        deleteChild: Expanded(
-            flex: 2,
-            child: InkWell(
-              onTap: () {
-                Provider.of<Chat>(context, listen: false)
-                    .deleteConversation(item.conversationID);
-              },
-              child: Container(
-                alignment: Alignment.center,
-                color: Colors.red,
-                child: Text(
-                  "删除",
-                  style: TextStyle(
-                    fontSize: 30.sp,
-                    color: Colors.white,
-                  ),
+        );
+      case 3:
+        return Row(
+          children: [
+            Container(
+              child: Text(
+                "[发送失败]",
+                style: TextStyle(
+                  color: Colors.black,
+                  fontSize: 25.sp,
                 ),
               ),
-            )),
-      ),
-    );
+            ),
+            Container(
+              child: Text(
+                lastmsg,
+                maxLines: 1,
+                overflow: TextOverflow.ellipsis,
+                style: TextStyle(
+                  color: Colors.black45,
+                  fontSize: 25.sp,
+                ),
+              ),
+            )
+          ],
+        );
+      case 6:
+        return Container(
+          child: Text(
+            v2timMsg.isSelf == true ? "你撤回了一条消息" : "对方撤回了一条消息",
+            style: TextStyle(
+              color: Colors.black45,
+              fontSize: 25.sp,
+            ),
+          ),
+        );
+      default:
+        return Container();
+    }
   }
 
   //页面跳转
@@ -452,7 +525,8 @@ class _HomeState extends State<Home> {
       transition: TransitionType.inFromRight,
       routeSettings: RouteSettings(
         arguments: {
-          "item": item,
+          "userID": item.userID,
+          "showName": item.showName,
         },
       ),
     );

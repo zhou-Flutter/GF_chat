@@ -5,6 +5,7 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:images_picker/images_picker.dart';
 import 'package:my_chat/provider/chat_provider.dart';
+import 'package:my_chat/provider/trtc_provider.dart';
 import 'package:my_chat/utils/color_tools.dart';
 import 'package:my_chat/utils/commons.dart';
 import 'package:provider/provider.dart';
@@ -191,7 +192,12 @@ class _FileMenuState extends State<FileMenu> {
 
   //语音童话
   Future voiceCall() async {
-    Provider.of<Chat>(context, listen: false)
-        .sendInviteMsg(widget.userID!, "roomID");
+    CallStatus callStatus =
+        Provider.of<Trtc>(context, listen: false).callStatus;
+    if (callStatus != CallStatus.nocall) {
+      Fluttertoast.showToast(msg: "已在通话中。。。");
+    } else {
+      Provider.of<Trtc>(context, listen: false).enterRoom(widget.userID!);
+    }
   }
 }

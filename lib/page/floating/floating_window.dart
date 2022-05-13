@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:my_chat/provider/trtc_provider.dart';
+import 'package:provider/src/provider.dart';
 
 class FloatingWindow extends StatefulWidget {
   const FloatingWindow({Key? key}) : super(key: key);
@@ -17,6 +19,7 @@ class _FloatingWindowState extends State<FloatingWindow> {
 
   @override
   Widget build(BuildContext context) {
+    var callTime = context.watch<Trtc>().callTime;
     return Container(
       decoration: BoxDecoration(
           color: Colors.white,

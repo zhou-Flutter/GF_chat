@@ -15,6 +15,7 @@ import 'package:my_chat/model/tencent_api_resp.dart';
 import 'package:my_chat/page/communal/communal.dart';
 import 'package:my_chat/page/floating/floating_window.dart';
 import 'package:my_chat/provider/chat_provider.dart';
+import 'package:my_chat/provider/trtc_provider.dart';
 import 'package:my_chat/utils/generate_test_user_sig.dart';
 import 'package:my_chat/utils/locator.dart';
 import 'package:my_chat/utils/tencent.dart';
@@ -94,18 +95,18 @@ class InitIMSDKProvider with ChangeNotifier {
 
     //接受消息监听
     await timManager.getMessageManager().addAdvancedMsgListener(
-      listener: V2TimAdvancedMsgListener(
-        onRecvNewMessage: (v2TimMessage) {
-          Provider.of<Chat>(context, listen: false)
-              .recvNewMessage(v2TimMessage);
-          Application.router.navigateTo(
-            MyChatApp.navigatorKey.currentState!.context,
-            "/addFriendPage",
-            transition: TransitionType.inFromRight,
-          );
-        },
-      ),
-    );
+          listener: V2TimAdvancedMsgListener(
+            onRecvNewMessage: (v2TimMessage) {
+              //接受消息
+              Provider.of<Chat>(context, listen: false)
+                  .recvNewMessage(v2TimMessage);
+            },
+            onRecvMessageRevoked: (msgID) {
+              //消息撤回
+              Provider.of<Chat>(context, listen: false).revoke(msgID);
+            },
+          ),
+        );
 
     //注册群组消息监听器
     await TencentImSDKPlugin.v2TIMManager.addGroupListener(
@@ -114,12 +115,28 @@ class InitIMSDKProvider with ChangeNotifier {
 
     //注册信令消息监听器
     await timManager.getSignalingManager().addSignalingListener(
-      listener: V2TimSignalingListener(
-        onReceiveNewInvitation: (a, b, c, d, e) {
-          print("信令监听");
-        },
-      ),
-    );
+          listener: V2TimSignalingListener(
+            onReceiveNewInvitation: (inviteID, inviter, c, d, data) {
+              print("收到信令");
+              Provider.of<Trtc>(context, listen: false)
+                  .receiveNewInvita(inviteID, data);
+            },
+            onInviteeAccepted: (a, b, e) {
+              Provider.of<Trtc>(context, listen: false).acceptInviteBack();
+            },
+            onInviteeRejected: (a, b, c) {
+              print("拒绝");
+              Provider.of<Trtc>(context, listen: false).rejectInviteBack();
+            },
+            onInvitationCancelled: (a, b, c) {
+              print("取消");
+              Provider.of<Trtc>(context, listen: false).onInvitationCancelled();
+            },
+            onInvitationTimeout: (a, b) {
+              print("超时");
+            },
+          ),
+        );
 
     //添加好友 监听
     await timManager.getFriendshipManager().addFriendListener(
@@ -134,7 +151,6 @@ class InitIMSDKProvider with ChangeNotifier {
         },
       ),
     );
-    float();
   }
 
   //登录
@@ -148,7 +164,7 @@ class InitIMSDKProvider with ChangeNotifier {
         transition: TransitionType.inFromRight,
       );
     } else {
-      GenerateTestUserSig usersig = GenerateTestUserSig(
+      GenerateTestUserIMSig usersig = GenerateTestUserIMSig(
         sdkappid: 1400559934,
         key: "a3e290c6599c803789611039131f2283508f2707c8da745934459f123c6b9817",
       );
@@ -270,27 +286,4 @@ class InitIMSDKProvider with ChangeNotifier {
   
    */
 
-  float() async {
-    floatingOne = floatingManager.createFloating(
-        "1",
-        Floating(
-          MyChatApp.navigatorKey,
-          FloatingWindow(),
-          slideType: FloatingSlideType.onRightAndTop,
-          height: 80,
-          width: 80,
-          top: 100,
-          slideTopHeight: 50,
-          isShowLog: false,
-          slideBottomHeight: 100,
-        ));
-  }
-
-  floatclose() {
-    floatingOne.hideFloating();
-  }
-
-  showfloat() {
-    floatingOne.open();
-  }
 }

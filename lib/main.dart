@@ -13,6 +13,7 @@ import 'package:my_chat/config/style/app_theme.dart';
 import 'package:my_chat/provider/chat_provider.dart';
 import 'package:my_chat/provider/common_provider.dart';
 import 'package:my_chat/provider/init_im_sdk_provider.dart';
+import 'package:my_chat/provider/trtc_provider.dart';
 import 'package:my_chat/utils/commons.dart';
 import 'package:my_chat/utils/locator.dart';
 import 'package:provider/provider.dart';
@@ -92,6 +93,9 @@ class _MyChatAppState extends State<MyChatApp> with WidgetsBindingObserver {
           ChangeNotifierProvider(
             create: (_) => Common(),
           ),
+          ChangeNotifierProvider(
+            create: (_) => Trtc(),
+          ),
         ],
         child: RefreshConfiguration(
           headerBuilder: () => Commons.refreshHeader(),
@@ -116,6 +120,7 @@ class _MyChatAppState extends State<MyChatApp> with WidgetsBindingObserver {
               //初始化SDK
               Provider.of<InitIMSDKProvider>(context, listen: false)
                   .initSDK(context);
+              Provider.of<Trtc>(context, listen: false).float();
 
               //加载等待插件
               widget = easyload(context, widget);

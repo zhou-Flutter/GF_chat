@@ -13,6 +13,9 @@ import 'package:my_chat/page/friend_new/friend_new.dart';
 
 import 'package:my_chat/page/login/login.dart';
 import 'package:my_chat/page/login/mobile_num_login.dart';
+import 'package:my_chat/page/self_info/self_info.dart';
+import 'package:my_chat/page/self_info/self_qr.dart';
+import 'package:my_chat/page/setup/setup.dart';
 import 'package:my_chat/page/splash/splash.dart';
 import 'package:my_chat/page/voice_call/voice_call_page.dart';
 import 'package:my_chat/page/widget.dart/user_agreement.dart';
@@ -41,7 +44,8 @@ var chatDetailHandler = Handler(
     handlerFunc: (BuildContext? context, Map<String, List<String>> params) {
   final args = context?.settings?.arguments as Map;
   return ChatDetailPage(
-    item: args['item'],
+    userID: args['userID'],
+    showName: args['showName'],
   );
 });
 
@@ -98,34 +102,17 @@ var voiceCallPageHandler = Handler(
   return VoiceCallPage();
 });
 
+var selfInfoPageHandler = Handler(
+    handlerFunc: (BuildContext? context, Map<String, List<String>> params) {
+  return SelfInfoPage();
+});
 
+var selfQrHandler = Handler(
+    handlerFunc: (BuildContext? context, Map<String, List<String>> params) {
+  return SelfQr();
+});
 
-
-
-
-
-
-
-
-
-
-
-
-
-// var splashAdHandler = Handler(
-//     handlerFunc: (BuildContext? context, Map<String, List<String>> params) {
-//   final args = context?.settings?.arguments as Map;
-//   return SplashAd(splashAd: args["splash_ad"]);
-// });
-
-// var moreContentFullSortHandler = Handler(
-//     handlerFunc: (BuildContext? context, Map<String, List<String>> params) {
-//   final args = context?.settings?.arguments as Map;
-//   return MoreContentFullSort(
-//     args['type'],
-//     args['list_type'],
-//     args['title'],
-//     isEnterFromHome:
-//         args['isEnterFromHome'] != null ? args['isEnterFromHome'] : false,
-//   );
-// });
+var setUpPageHandler = Handler(
+    handlerFunc: (BuildContext? context, Map<String, List<String>> params) {
+  return SetUpPage();
+});

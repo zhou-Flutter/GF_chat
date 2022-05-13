@@ -101,8 +101,6 @@ class Chat with ChangeNotifier {
         if (newMessage.msgID != _c2CMsgList[0].msgID) {
           _c2CMsgList.insert(0, newMessage);
           eventBus.fire(UpdateChatPageEvent(_c2CMsgList, false));
-          print("情况聊天页面的消息ID");
-          print(pageUserId);
           clearC2CMsgUnRead(pageUserId);
         }
       }
@@ -116,7 +114,6 @@ class Chat with ChangeNotifier {
         .getMessageManager()
         .markC2CMessageAsRead(userID: userID);
     if (res.code == 0) {
-      print("清空聊天成功");
       getConversationList();
     }
   }
@@ -267,13 +264,6 @@ class Chat with ChangeNotifier {
     }
   }
 
-  //发送信令消息 用来进行语音聊天
-  sendInviteMsg(String userID, String data) async {
-    await TencentImSDKPlugin.v2TIMManager
-        .getSignalingManager()
-        .invite(invitee: userID, onlineUserOnly: true, data: data);
-  }
-
   //设置本地消息 用来设置语音红点未读
   setLocalCustomInt(msgID, localCustomInt) async {
     V2TimCallback res = await TencentImSDKPlugin.v2TIMManager
@@ -321,9 +311,49 @@ class Chat with ChangeNotifier {
     }
   }
 
+  //删除某个消息
+  deleteMessages(msgID) async {
+    await TencentImSDKPlugin.v2TIMManager
+        .getMessageManager()
+        .deleteMessages(msgIDs: [msgID]);
+    for (int i = 0; i < _c2CMsgList.length; i++) {
+      if (_c2CMsgList[i].msgID == msgID) {
+        _c2CMsgList.removeAt(i);
+        eventBus.fire(UpdateChatPageEvent(_c2CMsgList, false));
+        break;
+      }
+    }
+  }
+
+  //消息撤回
+  revokeMessage(msgID) async {
+    await TencentImSDKPlugin.v2TIMManager
+        .getMessageManager()
+        .revokeMessage(msgID: msgID);
+    revoke(msgID);
+  }
+
+  //撤回 回调 修改信息
+  revoke(msgID) {
+    for (int i = 0; i < _c2CMsgList.length; i++) {
+      if (_c2CMsgList[i].msgID == msgID) {
+        _c2CMsgList[i].status = 6;
+        eventBus.fire(UpdateChatPageEvent(_c2CMsgList, false));
+        break;
+      }
+    }
+  }
+
 /* 
 
+
+
+  
+
+
+
    好友关系链
+
 
  */
 

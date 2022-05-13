@@ -123,56 +123,7 @@ class _ContactsState extends State<Contacts> {
               ),
               padding: EdgeInsets.symmetric(horizontal: 35.r),
             ),
-            menuBuilder: () => ClipRRect(
-              borderRadius: BorderRadius.circular(15.r),
-              child: Container(
-                color: const Color(0xFF4C4C4C),
-                child: IntrinsicWidth(
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.stretch,
-                    children: menuItems
-                        .map(
-                          (item) => GestureDetector(
-                            behavior: HitTestBehavior.translucent,
-                            onTap: () {
-                              _menuToPage(item.title);
-                              _controller.hideMenu();
-                            },
-                            child: Container(
-                              height: 80.h,
-                              padding: EdgeInsets.symmetric(horizontal: 40.r),
-                              child: Row(
-                                children: <Widget>[
-                                  Icon(
-                                    item.icon,
-                                    size: 40.r,
-                                    color: Colors.white,
-                                  ),
-                                  Expanded(
-                                    child: Container(
-                                      margin: EdgeInsets.only(
-                                          left: 20.r, right: 20.r),
-                                      padding:
-                                          EdgeInsets.symmetric(vertical: 20.r),
-                                      child: Text(
-                                        item.title,
-                                        style: TextStyle(
-                                          color: Colors.white,
-                                          fontSize: 28.sp,
-                                        ),
-                                      ),
-                                    ),
-                                  ),
-                                ],
-                              ),
-                            ),
-                          ),
-                        )
-                        .toList(),
-                  ),
-                ),
-              ),
-            ),
+            menuBuilder: () => popupMenu(),
             pressType: PressType.singleClick,
             verticalMargin: -10,
             controller: _controller,
@@ -210,6 +161,58 @@ class _ContactsState extends State<Contacts> {
             ),
           )
         ],
+      ),
+    );
+  }
+
+  //弹出菜单
+  Widget popupMenu() {
+    return ClipRRect(
+      borderRadius: BorderRadius.circular(15.r),
+      child: Container(
+        color: const Color(0xFF4C4C4C),
+        child: IntrinsicWidth(
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.stretch,
+            children: menuItems
+                .map(
+                  (item) => GestureDetector(
+                    behavior: HitTestBehavior.translucent,
+                    onTap: () {
+                      _menuToPage(item.title);
+                      _controller.hideMenu();
+                    },
+                    child: Container(
+                      height: 80.h,
+                      padding: EdgeInsets.symmetric(horizontal: 40.r),
+                      child: Row(
+                        children: <Widget>[
+                          Icon(
+                            item.icon,
+                            size: 40.r,
+                            color: Colors.white,
+                          ),
+                          Expanded(
+                            child: Container(
+                              margin: EdgeInsets.only(left: 20.r, right: 20.r),
+                              padding: EdgeInsets.symmetric(vertical: 20.r),
+                              child: Text(
+                                item.title,
+                                style: TextStyle(
+                                  color: Colors.white,
+                                  fontSize: 28.sp,
+                                ),
+                              ),
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ),
+                )
+                .toList(),
+          ),
+        ),
       ),
     );
   }

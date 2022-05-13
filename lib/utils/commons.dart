@@ -156,9 +156,10 @@ class _SingleTouchRecognizer extends OneSequenceGestureRecognizer {
 Widget backBtn(context) {
   return Container(
     child: IconButton(
-      icon: Image.asset(
-        Constant.assetsImg + 'back_blc.png',
-        width: 40.w,
+      icon: Icon(
+        Icons.arrow_back_ios,
+        size: 40.r,
+        color: Colors.black,
       ),
       onPressed: () {
         Application.router.pop(context);

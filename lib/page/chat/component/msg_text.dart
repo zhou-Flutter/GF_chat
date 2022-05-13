@@ -1,15 +1,30 @@
+import 'package:custom_pop_up_menu/custom_pop_up_menu.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:fluttertoast/fluttertoast.dart';
 import 'package:loading_indicator/loading_indicator.dart';
 import 'package:my_chat/page/widget.dart/avatar.dart';
 import 'package:my_chat/provider/chat_provider.dart';
 import 'package:my_chat/utils/color_tools.dart';
+import 'package:my_chat/utils/commons.dart';
 import 'package:my_chat/utils/event_bus.dart';
 import 'package:my_chat/utils/text_height.dart';
 import 'package:provider/provider.dart';
 import 'package:tencent_im_sdk_plugin/enum/message_elem_type.dart';
 import 'package:tencent_im_sdk_plugin/models/v2_tim_message.dart';
+
+class ItemModel {
+  int id;
+  String title;
+  IconData icon;
+  ItemModel(
+    this.id,
+    this.title,
+    this.icon,
+  );
+}
 
 //文本消息
 class TextMsg extends StatefulWidget {
@@ -27,6 +42,17 @@ class _TextMsgState extends State<TextMsg> {
   double height = 70.r;
 
   var textMsg = "";
+
+  List<ItemModel> menuItems = [
+    ItemModel(1, '复制', Icons.content_copy),
+    ItemModel(2, '删除', Icons.delete),
+    ItemModel(3, '转发', Icons.send),
+    ItemModel(4, '撤回', Icons.replay),
+  ];
+
+  final CustomPopupMenuController _popupMenucontroller =
+      CustomPopupMenuController();
+
   @override
   void initState() {
     super.initState();
@@ -43,6 +69,30 @@ class _TextMsgState extends State<TextMsg> {
     );
     if (dou + 30.r > 70.r) {
       height = dou + 30.r;
+    }
+  }
+
+  //选择菜单
+  _selectMenu(id) {
+    switch (id) {
+      case 1:
+        Clipboard.setData(ClipboardData(text: textMsg));
+        Fluttertoast.showToast(msg: "复制成功");
+        break;
+      case 2:
+        Provider.of<Chat>(context, listen: false)
+            .deleteMessages(widget.item!.msgID);
+        Fluttertoast.showToast(msg: "删除成功");
+        break;
+      case 3:
+        print("转发");
+        break;
+      case 4:
+        print("撤回");
+        Provider.of<Chat>(context, listen: false)
+            .revokeMessage(widget.item!.msgID);
+        break;
+      default:
     }
   }
 
@@ -66,17 +116,16 @@ class _TextMsgState extends State<TextMsg> {
           ),
           triangle(widget.item!.isSelf),
           Flexible(
-            child: Container(
-              constraints: BoxConstraints(minHeight: 70.r, minWidth: 70.w),
-              padding: EdgeInsets.all(15.r),
-              decoration: BoxDecoration(
-                color: widget.item!.isSelf == true
-                    ? HexColor.fromHex('#9370DB')
-                    : Colors.white,
-                borderRadius: BorderRadius.circular(15.r),
-              ),
-              child: InkWell(
-                onTap: () {},
+            child: CustomPopupMenu(
+              child: Container(
+                constraints: BoxConstraints(minHeight: 70.r, minWidth: 70.w),
+                padding: EdgeInsets.all(15.r),
+                decoration: BoxDecoration(
+                  color: widget.item!.isSelf == true
+                      ? HexColor.fromHex('#9370DB')
+                      : Colors.white,
+                  borderRadius: BorderRadius.circular(15.r),
+                ),
                 child: Text(
                   "$textMsg",
                   style: TextStyle(
@@ -84,6 +133,12 @@ class _TextMsgState extends State<TextMsg> {
                   ),
                 ),
               ),
+              menuBuilder: _buildLongPressMenu,
+              barrierColor: Colors.transparent,
+              pressType: PressType.longPress,
+              verticalMargin: 0,
+              horizontalMargin: 15,
+              controller: _popupMenucontroller,
             ),
           ),
           Container(
@@ -100,18 +155,65 @@ class _TextMsgState extends State<TextMsg> {
     );
   }
 
+  //长按 弹出菜单
+  Widget _buildLongPressMenu() {
+    return ClipRRect(
+      borderRadius: BorderRadius.circular(5),
+      child: Container(
+        width: 180,
+        color: const Color(0xFF4C4C4C),
+        child: GridView.count(
+          padding: const EdgeInsets.symmetric(horizontal: 5, vertical: 10),
+          crossAxisCount: 4,
+          crossAxisSpacing: 0,
+          mainAxisSpacing: 10,
+          shrinkWrap: true,
+          physics: NeverScrollableScrollPhysics(),
+          children: menuItems
+              .map(
+                (item) => InkWell(
+                  onTap: () {
+                    _selectMenu(item.id);
+                    _popupMenucontroller.hideMenu();
+                  },
+                  child: Column(
+                    mainAxisSize: MainAxisSize.min,
+                    children: <Widget>[
+                      Icon(
+                        item.icon,
+                        size: 20,
+                        color: Colors.white,
+                      ),
+                      Container(
+                        margin: EdgeInsets.only(top: 2),
+                        child: Text(
+                          item.title,
+                          style: TextStyle(color: Colors.white, fontSize: 12),
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              )
+              .toList(),
+        ),
+      ),
+    );
+  }
+
   //消息状态
   Widget msgStatus(state) {
     switch (state) {
       case 0:
         return Container(
-            height: 70.r,
-            width: 70.r,
-            padding: EdgeInsets.all(20.r),
-            child: const LoadingIndicator(
-              indicatorType: Indicator.lineSpinFadeLoader,
-              colors: [Colors.black26],
-            ));
+          height: 70.r,
+          width: 70.r,
+          padding: EdgeInsets.all(20.r),
+          child: const LoadingIndicator(
+            indicatorType: Indicator.lineSpinFadeLoader,
+            colors: [Colors.black26],
+          ),
+        );
       case 2:
         return Container(
           height: 70.r,

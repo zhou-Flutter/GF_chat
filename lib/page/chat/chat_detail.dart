@@ -1,4 +1,5 @@
 import 'package:audioplayers/audioplayers.dart';
+import 'package:custom_pop_up_menu/custom_pop_up_menu.dart';
 import 'package:extended_list/extended_list.dart';
 import 'package:fluro/fluro.dart';
 
@@ -35,10 +36,12 @@ import 'dart:async';
 import 'package:flutter_spinkit/flutter_spinkit.dart';
 
 class ChatDetailPage extends StatefulWidget {
-  V2TimConversation? item;
+  String? userID;
+  String? showName;
   ChatDetailPage({
     Key? key,
-    this.item,
+    this.userID,
+    this.showName,
   }) : super(key: key);
 
   @override
@@ -61,7 +64,7 @@ class _ChatDetailPageState extends State<ChatDetailPage> {
   void initState() {
     super.initState();
 
-    userID = widget.item!.userID;
+    userID = widget.userID;
     Provider.of<Chat>(context, listen: false).getC2CMsgList(userID);
     Provider.of<Chat>(context, listen: false).setUserId(userID);
     Provider.of<Chat>(context, listen: false).chatPage(true);
@@ -102,7 +105,7 @@ class _ChatDetailPageState extends State<ChatDetailPage> {
         leading: backBtn(context),
         centerTitle: true,
         title: Text(
-          "${widget.item!.showName}",
+          "${widget.showName}",
           style: TextStyle(fontSize: 35.sp),
         ),
         actions: <Widget>[
@@ -207,44 +210,60 @@ class _ChatDetailPageState extends State<ChatDetailPage> {
                     ),
                   )
                 : Container(),
-            Container(
-              child: msgContent(item),
-            )
+            msgContent(item),
           ],
         ),
       ),
     );
   }
 
+  //消息
   Widget msgContent(V2TimMessage item) {
+    switch (item.status) {
+      case 6:
+        return Text(
+          item.isSelf == true ? "你撤回了一条消息" : "对方撤回了一条消息",
+          style: TextStyle(
+            color: Colors.black38,
+            fontSize: 25.sp,
+          ),
+        );
+      default:
+        return content(item);
+    }
+  }
+
+  //消息内容
+  Widget content(V2TimMessage item) {
     switch (item.elemType) {
       case MessageElemType.V2TIM_ELEM_TYPE_TEXT:
+        // textMsg = "[自定义消息]";
         return TextMsg(item: item);
-        break;
+
       case MessageElemType.V2TIM_ELEM_TYPE_CUSTOM:
         // textMsg = "[自定义消息]";
         return Container();
-        break;
+
       case MessageElemType.V2TIM_ELEM_TYPE_IMAGE:
         // textMsg = "[图片]";
         return MsgImage(item: item);
-        break;
+
       case MessageElemType.V2TIM_ELEM_TYPE_SOUND:
         // textMsg = "[语音]";
         return MsgVoice(item: item, audioPlayer: audioPlayer);
-        break;
+
       case MessageElemType.V2TIM_ELEM_TYPE_VIDEO:
         // textMsg = "[视频]";
         return MsgVideo(item: item);
-        break;
+
       case MessageElemType.V2TIM_ELEM_TYPE_FILE:
         // textMsg = "[文件]";
         return Container();
-        break;
+
       case MessageElemType.V2TIM_ELEM_TYPE_FACE:
         // textMsg = "[表情包]";
         return customEmo(item: item);
-        break;
+
       default:
         return Container();
     }

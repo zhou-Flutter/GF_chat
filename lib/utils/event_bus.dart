@@ -50,3 +50,13 @@ class ChatMsgHightEvent {
   double hight;
   ChatMsgHightEvent(this.hight);
 }
+
+//通知 界面
+class NoticeEvent {
+  Notice notice;
+  NoticeEvent(this.notice);
+}
+
+enum Notice {
+  voicePage, //通话界面
+}

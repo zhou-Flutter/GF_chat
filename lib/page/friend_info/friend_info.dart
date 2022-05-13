@@ -196,6 +196,7 @@ class _FriendInfoPageState extends State<FriendInfoPage> {
                 routeSettings: RouteSettings(
                   arguments: {
                     "userID": userID,
+                    "showName": userID,
                   },
                 ),
               );

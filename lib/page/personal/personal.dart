@@ -50,76 +50,85 @@ class _PersonalState extends State<Personal> {
 
   // 头部信息
   Widget hander(V2TimUserFullInfo info) {
-    return Container(
-      color: Colors.white,
-      padding: EdgeInsets.symmetric(horizontal: 40.r),
-      child: Row(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Container(
-            width: 120.r,
-            height: 120.r,
-            child: ClipRRect(
-              borderRadius: BorderRadius.circular(10), //弧度
-              child: Image.network(
-                info.faceUrl!,
-                fit: BoxFit.fill,
+    return InkWell(
+      onTap: () {
+        Application.router.navigateTo(
+          context,
+          "/selfInfoPage",
+          transition: TransitionType.inFromRight,
+        );
+      },
+      child: Container(
+        color: Colors.white,
+        padding: EdgeInsets.symmetric(horizontal: 40.r),
+        child: Row(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Container(
+              width: 120.r,
+              height: 120.r,
+              child: ClipRRect(
+                borderRadius: BorderRadius.circular(10), //弧度
+                child: Image.network(
+                  info.faceUrl!,
+                  fit: BoxFit.fill,
+                ),
               ),
             ),
-          ),
-          SizedBox(width: 20.w),
-          Expanded(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
+            SizedBox(width: 20.w),
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Container(
+                    padding: EdgeInsets.only(bottom: 20.r),
+                    child: Text(
+                      "${info.nickName}",
+                      overflow: TextOverflow.ellipsis,
+                      style: TextStyle(
+                        fontSize: 50.sp,
+                        fontWeight: FontWeight.w600,
+                      ),
+                    ),
+                  ),
+                  Container(
+                    padding: EdgeInsets.only(bottom: 10.r),
+                    child: Text(
+                      "ID:${info.userID}",
+                      overflow: TextOverflow.ellipsis,
+                      style: TextStyle(
+                        color: Colors.black38,
+                        fontSize: 28.sp,
+                      ),
+                    ),
+                  ),
+                  Container(
+                    padding: EdgeInsets.only(bottom: 20.r),
+                    child: Text(
+                      "签名: 暂无设置签名",
+                      overflow: TextOverflow.ellipsis,
+                      style: TextStyle(
+                        color: Colors.black38,
+                        fontSize: 28.sp,
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+            ),
+            Row(
               children: [
                 Container(
-                  padding: EdgeInsets.only(bottom: 20.r),
-                  child: Text(
-                    "${info.nickName}",
-                    overflow: TextOverflow.ellipsis,
-                    style: TextStyle(
-                      fontSize: 50.sp,
-                      fontWeight: FontWeight.w600,
-                    ),
+                  padding: EdgeInsets.only(top: 80.r, left: 20),
+                  child: Icon(
+                    IconData(0xe601, fontFamily: "icons"),
+                    size: 30.r,
                   ),
-                ),
-                Container(
-                  padding: EdgeInsets.only(bottom: 10.r),
-                  child: Text(
-                    "ID:${info.userID}",
-                    overflow: TextOverflow.ellipsis,
-                    style: TextStyle(
-                      color: Colors.black38,
-                      fontSize: 28.sp,
-                    ),
-                  ),
-                ),
-                Container(
-                  padding: EdgeInsets.only(bottom: 20.r),
-                  child: Text(
-                    "签名: 暂无设置签名",
-                    overflow: TextOverflow.ellipsis,
-                    style: TextStyle(
-                      color: Colors.black38,
-                      fontSize: 28.sp,
-                    ),
-                  ),
-                ),
+                )
               ],
-            ),
-          ),
-          Row(
-            children: [
-              Container(
-                padding: EdgeInsets.only(top: 80.r, left: 20),
-                child: Icon(
-                  IconData(0xe601, fontFamily: "icons"),
-                  size: 30.r,
-                ),
-              )
-            ],
-          )
-        ],
+            )
+          ],
+        ),
       ),
     );
   }
@@ -175,7 +184,7 @@ class _PersonalState extends State<Personal> {
       onTap: () {
         Application.router.navigateTo(
           context,
-          "/addFriendPage",
+          "/setUpPage",
           transition: TransitionType.inFromRight,
         );
       },

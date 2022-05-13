@@ -20,8 +20,10 @@ class Routes {
   static String sendAddPage = "/sendAddPage"; //发送添加好友页面
   static String videoPlay = "/videoPlay";
   static String photosView = "/photosView";
-
   static String voiceCallPage = "/voiceCallPage";
+  static String selfInfoPage = "/selfInfoPage";
+  static String selfQr = "/selfQr"; //二维码界面
+  static String setUpPage = "/setUpPage"; //设置界面
 
   static void configureRoutes(FluroRouter router) {
     router.notFoundHandler = Handler(
@@ -42,8 +44,10 @@ class Routes {
     router.define(sendAddPage, handler: sendAddPageHandler);
     router.define(videoPlay, handler: videoPlayHandler);
     router.define(photosView, handler: photosViewHandler);
-
     router.define(voiceCallPage, handler: voiceCallPageHandler);
+    router.define(selfInfoPage, handler: selfInfoPageHandler);
+    router.define(selfQr, handler: selfQrHandler);
+    router.define(setUpPage, handler: setUpPageHandler);
   }
 
   // 对参数进行encode，解决参数中有特殊字符

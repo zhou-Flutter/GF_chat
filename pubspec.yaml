@@ -63,6 +63,8 @@ dependencies:
   custom_pop_up_menu: ^1.2.3+1
   # IM
   tencent_im_sdk_plugin: ^4.0.0
+  # 腾讯云音视频
+  tencent_trtc_cloud: ^2.2.3
   # 加载指示条
   loading_indicator: ^3.0.3
   # 音频播放
@@ -99,6 +101,13 @@ dependencies:
   photo_view: ^0.13.0
   # 悬浮窗
   flutter_floating: ^0.0.1
+  # 生成二维码
+  qr_flutter: ^4.0.0
+  # 图片保存
+  image_gallery_saver: ^1.7.1
+
+  # # 扫描二维码
+  # mobile_scanner: ^1.0.0
   # # 文件选择
   # file_picker: ^4.5.1
  

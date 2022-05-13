@@ -7,8 +7,8 @@ import 'package:crypto/crypto.dart';
 
 ///生成腾讯云即时通信测试用userSig
 ///
-class GenerateTestUserSig {
-  GenerateTestUserSig({required this.sdkappid, required this.key});
+class GenerateTestUserIMSig {
+  GenerateTestUserIMSig({required this.sdkappid, required this.key});
   int sdkappid;
   String key;
 

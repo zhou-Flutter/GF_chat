@@ -1,5 +1,7 @@
+import 'package:fluro/fluro.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:my_chat/config/routes/application.dart';
 import 'package:my_chat/utils/color_tools.dart';
 import 'package:my_chat/utils/commons.dart';
 
@@ -33,8 +35,14 @@ class _SetUpPageState extends State<SetUpPage> {
               independent: true,
             ),
             toolItem(
-              onTap: () {},
-              title: "隐私权限",
+              onTap: () {
+                Application.router.navigateTo(
+                  context,
+                  "/permission",
+                  transition: TransitionType.inFromRight,
+                );
+              },
+              title: "权限",
               independent: true,
             ),
             toolItem(

@@ -24,6 +24,8 @@ class Routes {
   static String selfInfoPage = "/selfInfoPage";
   static String selfQr = "/selfQr"; //二维码界面
   static String setUpPage = "/setUpPage"; //设置界面
+  static String permission = "/permission"; //权限
+  static String chatSetting = "/chatSetting"; //权限
 
   static void configureRoutes(FluroRouter router) {
     router.notFoundHandler = Handler(
@@ -48,6 +50,8 @@ class Routes {
     router.define(selfInfoPage, handler: selfInfoPageHandler);
     router.define(selfQr, handler: selfQrHandler);
     router.define(setUpPage, handler: setUpPageHandler);
+    router.define(permission, handler: permissionHandler);
+    router.define(chatSetting, handler: chatSettingHandler);
   }
 
   // 对参数进行encode，解决参数中有特殊字符

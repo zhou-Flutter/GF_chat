@@ -5,6 +5,7 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:images_picker/images_picker.dart';
 import 'package:my_chat/provider/chat_provider.dart';
+import 'package:my_chat/provider/init_im_sdk_provider.dart';
 import 'package:my_chat/provider/trtc_provider.dart';
 import 'package:my_chat/utils/color_tools.dart';
 import 'package:my_chat/utils/commons.dart';
@@ -34,10 +35,13 @@ class _FileMenuState extends State<FileMenu> {
   ];
   var imageSize = 20 * 1024; //发送图片不能超过20M
 
+  var selfId;
+
   @override
   void initState() {
     // TODO: implement initState
     super.initState();
+    selfId = Provider.of<InitIMSDKProvider>(context, listen: false).selfId;
   }
 
   @override
@@ -197,7 +201,8 @@ class _FileMenuState extends State<FileMenu> {
     if (callStatus != CallStatus.nocall) {
       Fluttertoast.showToast(msg: "已在通话中。。。");
     } else {
-      Provider.of<Trtc>(context, listen: false).enterRoom(widget.userID!);
+      Provider.of<Trtc>(context, listen: false)
+          .enterRoom(widget.userID!, selfId);
     }
   }
 }

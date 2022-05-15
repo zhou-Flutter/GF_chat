@@ -45,7 +45,7 @@ class InitIMSDKProvider with ChangeNotifier {
   String _userId = ""; //用户ID
   TencentUserInfoResp? userInfo; //腾讯 QQ 用户信息
 
-  String get userId => _userId;
+  String get selfId => _userId;
   late Floating floatingOne;
 
   //初始化IM SDK
@@ -68,7 +68,7 @@ class InitIMSDKProvider with ChangeNotifier {
             print("挤下线");
           },
           onSelfInfoUpdated: (info) {
-            Provider.of<Chat>(context, listen: false).getSelfInfo(userId);
+            Provider.of<Chat>(context, listen: false).getSelfInfo(_userId);
           },
           onUserSigExpired: () {},
         ));
@@ -155,8 +155,8 @@ class InitIMSDKProvider with ChangeNotifier {
 
   //登录
   tologin(context) async {
-    print(userId);
-    if (userId == "") {
+    print(_userId);
+    if (_userId == "") {
       Application.router.navigateTo(
         context,
         "/loginPage",
@@ -169,9 +169,9 @@ class InitIMSDKProvider with ChangeNotifier {
         key: "a3e290c6599c803789611039131f2283508f2707c8da745934459f123c6b9817",
       );
 
-      String pwdStr = usersig.genSig(identifier: userId, expire: 86400);
+      String pwdStr = usersig.genSig(identifier: _userId, expire: 86400);
       V2TimCallback data = await TencentImSDKPlugin.v2TIMManager.login(
-        userID: userId,
+        userID: _userId,
         userSig: pwdStr,
       );
 
@@ -254,7 +254,7 @@ class InitIMSDKProvider with ChangeNotifier {
   // 获取 userId
   saveUserId() async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
-    prefs.setString("userId", userId);
+    prefs.setString("userId", _userId);
   }
 
   // 获取 userId  进行登录

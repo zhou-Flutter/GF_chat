@@ -47,7 +47,7 @@ class BottomNavState extends State<BottomNav>
   @override
   void initState() {
     _controller = PageController(initialPage: 0);
-    var userId = Provider.of<InitIMSDKProvider>(context, listen: false).userId;
+    var userId = Provider.of<InitIMSDKProvider>(context, listen: false).selfId;
     Provider.of<Chat>(context, listen: false).getUnreadCount();
     Provider.of<Chat>(context, listen: false).getFriendList(); //获取好友列表
     Provider.of<Chat>(context, listen: false).getSelfInfo(userId);

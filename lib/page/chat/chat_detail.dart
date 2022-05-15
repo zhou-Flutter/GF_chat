@@ -114,7 +114,13 @@ class _ChatDetailPageState extends State<ChatDetailPage> {
                 Icons.more_horiz,
                 color: Colors.black,
               ),
-              onPressed: () {}),
+              onPressed: () {
+                Application.router.navigateTo(
+                  context,
+                  "/chatSetting",
+                  transition: TransitionType.inFromRight,
+                );
+              }),
         ],
       ),
       body: GestureDetector(

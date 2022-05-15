@@ -11,10 +11,12 @@ import 'package:my_chat/config/routes/application.dart';
 import 'package:my_chat/main.dart';
 import 'package:my_chat/page/floating/floating_window.dart';
 import 'package:my_chat/page/voice_call/voice_call_page.dart';
+import 'package:my_chat/provider/init_im_sdk_provider.dart';
 import 'package:my_chat/utils/GenerateTestUserSig.dart';
 import 'package:my_chat/utils/commons.dart';
 import 'package:my_chat/utils/event_bus.dart';
 import 'package:my_chat/utils/generate_test_user_sig.dart';
+import 'package:provider/provider.dart';
 import 'package:tencent_im_sdk_plugin/models/v2_tim_value_callback.dart';
 import 'package:tencent_im_sdk_plugin/tencent_im_sdk_plugin.dart';
 import 'package:tencent_trtc_cloud/trtc_cloud.dart';
@@ -32,7 +34,8 @@ class Trtc with ChangeNotifier {
   var _inviteID; //信令ID
   CallStatus _callStatus = CallStatus.nocall; //通话状态
   int quality = TRTCCloudDef.TRTC_AUDIO_QUALITY_DEFAULT;
-  var userId;
+  var userId; //对方的Id
+  var selfId; // 自己的id
   int _roomId = 123;
 
   int get callTime => _callTime;
@@ -47,17 +50,18 @@ class Trtc with ChangeNotifier {
   // }
 
   //初始化  加入房间
-  enterRoom(userId) async {
-    userId = userId;
+  enterRoom(userID, selfID) async {
+    userId = userID;
+    selfId = selfID;
     trtcCloud = (await TRTCCloud.sharedInstance())!;
     trtcCloud.registerListener(onRtcListener);
 
-    userInfo['userSig'] = await GenerateTestUserSig.genTestSig(userId);
+    userInfo['userSig'] = await GenerateTestUserSig.genTestSig(selfId);
 
     await trtcCloud.enterRoom(
         TRTCParams(
           sdkAppId: GenerateTestUserSig.sdkAppId,
-          userId: userId,
+          userId: selfId,
           userSig: userInfo['userSig'],
           role: TRTCCloudDef.TRTCRoleAnchor,
           roomId: _roomId,
@@ -67,27 +71,26 @@ class Trtc with ChangeNotifier {
 
     initData();
 
-    sendInviteMsg(userId);
+    sendInviteMsg();
   }
 
   //被邀请者
-  addRoom(userId) async {
-    userId = userId;
+  addRoom() async {
     trtcCloud = (await TRTCCloud.sharedInstance())!;
     trtcCloud.registerListener(onRtcListener);
 
-    userInfo['userSig'] = await GenerateTestUserSig.genTestSig(userId);
+    userInfo['userSig'] = await GenerateTestUserSig.genTestSig(selfId);
 
     await trtcCloud.enterRoom(
         TRTCParams(
           sdkAppId: GenerateTestUserSig.sdkAppId,
-          userId: userId,
+          userId: selfId,
           userSig: userInfo['userSig'],
           role: TRTCCloudDef.TRTCRoleAnchor,
           roomId: _roomId,
         ),
         TRTCCloudDef.TRTC_APP_SCENE_AUDIOCALL);
-    print("初始化加入房间");
+    print("被邀请者初始化加入房间");
 
     initData();
   }
@@ -118,24 +121,17 @@ class Trtc with ChangeNotifier {
     //离开房间
     if (type == TRTCCloudListener.onExitRoom) {
       print('离开房间');
-      if (param > 0) {
-        print('exit room success11');
-      }
+      exitRoom();
     }
 
     //被邀请者加入房间
     if (type == TRTCCloudListener.onRemoteUserEnterRoom) {
       print('被邀请者加入房间');
-      if (param > 0) {
-        print('被邀请者加入房间');
-      }
     }
     //被邀请者离开房间
     if (type == TRTCCloudListener.onRemoteUserLeaveRoom) {
       print('被邀请者离开房间');
-      if (param > 0) {
-        exitRoom();
-      }
+      exitRoom();
     }
     //首帧本地音频数据已经被送出
     if (type == TRTCCloudListener.onSendFirstLocalAudioFrame) {
@@ -190,6 +186,7 @@ class Trtc with ChangeNotifier {
     if (_callStatus == CallStatus.nocall) {
       _inviteID = inviteId;
       _roomId = int.parse(data);
+
       _callStatus = CallStatus.receiveing;
       Application.router.navigateTo(
         MyChatApp.navigatorKey.currentState!.context,
@@ -205,11 +202,11 @@ class Trtc with ChangeNotifier {
   }
 
   //发送信令消息 用来进行语音聊天
-  sendInviteMsg(String userID) async {
+  sendInviteMsg() async {
     EasyLoading.show(status: '正在呼叫...');
     V2TimValueCallback<String> res = await TencentImSDKPlugin.v2TIMManager
         .getSignalingManager()
-        .invite(invitee: userID, data: "$_roomId", onlineUserOnly: true);
+        .invite(invitee: userId, data: "$_roomId", onlineUserOnly: true);
 
     _inviteID = res.data;
     _callStatus = CallStatus.sendering;
@@ -223,14 +220,15 @@ class Trtc with ChangeNotifier {
   }
 
   //接受信令 开始通话
-  acceptInvite(userID) async {
+  acceptInvite(selfID) async {
+    selfId = selfID;
     await TencentImSDKPlugin.v2TIMManager
         .getSignalingManager()
         .accept(inviteID: _inviteID);
     _callStatus = CallStatus.calling;
-    addRoom(userID);
+    addRoom();
     //开始计时
-    callTimer();
+    // callTimer();
     notifyListeners();
   }
 
@@ -269,6 +267,7 @@ class Trtc with ChangeNotifier {
   //监听 接受信令 回调
   acceptInviteBack() {
     //信令被接受，开始计时
+    _callStatus = CallStatus.calling;
     callTimer();
   }
 

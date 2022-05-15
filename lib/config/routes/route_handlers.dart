@@ -5,6 +5,7 @@ import 'package:my_chat/page/bottomtab/bottom_navigation.dart';
 import 'package:my_chat/page/chat/chat_detail.dart';
 import 'package:my_chat/page/chat/component/photo_view.dart';
 import 'package:my_chat/page/chat/component/video_play.dart';
+import 'package:my_chat/page/chat_setting/chat_setting.dart';
 import 'package:my_chat/page/friend_add/add_friend.dart';
 import 'package:my_chat/page/friend_add/component/search_friend.dart';
 import 'package:my_chat/page/friend_add/send_add_page.dart';
@@ -15,6 +16,7 @@ import 'package:my_chat/page/login/login.dart';
 import 'package:my_chat/page/login/mobile_num_login.dart';
 import 'package:my_chat/page/self_info/self_info.dart';
 import 'package:my_chat/page/self_info/self_qr.dart';
+import 'package:my_chat/page/setup/permission.dart';
 import 'package:my_chat/page/setup/setup.dart';
 import 'package:my_chat/page/splash/splash.dart';
 import 'package:my_chat/page/voice_call/voice_call_page.dart';
@@ -115,4 +117,14 @@ var selfQrHandler = Handler(
 var setUpPageHandler = Handler(
     handlerFunc: (BuildContext? context, Map<String, List<String>> params) {
   return SetUpPage();
+});
+
+var permissionHandler = Handler(
+    handlerFunc: (BuildContext? context, Map<String, List<String>> params) {
+  return Permission();
+});
+
+var chatSettingHandler = Handler(
+    handlerFunc: (BuildContext? context, Map<String, List<String>> params) {
+  return ChatSetting();
 });

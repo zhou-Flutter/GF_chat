@@ -7,6 +7,7 @@ import 'package:my_chat/config/routes/application.dart';
 import 'package:my_chat/model/tencent_api_resp.dart';
 import 'package:my_chat/utils/event_bus.dart';
 import 'package:tencent_im_sdk_plugin/enum/friend_type_enum.dart';
+import 'package:tencent_im_sdk_plugin/enum/user_info_allow_type.dart';
 import 'package:tencent_im_sdk_plugin/models/v2_tim_callback.dart';
 import 'package:tencent_im_sdk_plugin/models/v2_tim_conversation.dart';
 import 'package:tencent_im_sdk_plugin/models/v2_tim_conversation_result.dart';
@@ -437,6 +438,7 @@ class Chat with ChangeNotifier {
     userIF.nickName = userinfo.nickname;
     userIF.faceUrl = userinfo.figureurlQq1;
     userIF.gender = userinfo.genderType;
+    userIF.allowType = AllowType.V2TIM_FRIEND_NEED_CONFIRM;
 
     V2TimCallback res =
         await TencentImSDKPlugin.v2TIMManager.setSelfInfo(userFullInfo: userIF);

@@ -17,13 +17,13 @@ class VoiceCallPage extends StatefulWidget {
 class _VoiceCallPageState extends State<VoiceCallPage> {
   var callTime = 0;
   var inviteId;
-  var userId;
+  var selfId;
   CallStatus callStatus = CallStatus.nocall;
   @override
   void initState() {
     super.initState();
     Provider.of<Trtc>(context, listen: false).floatHide();
-    userId = Provider.of<InitIMSDKProvider>(context, listen: false).userId;
+    selfId = Provider.of<InitIMSDKProvider>(context, listen: false).selfId;
 
     //接收是否有滑块激活
     eventBus.on<NoticeEvent>().listen((event) {
@@ -159,7 +159,7 @@ class _VoiceCallPageState extends State<VoiceCallPage> {
                 onTap: () {
                   print("同意通话");
                   Provider.of<Trtc>(context, listen: false)
-                      .acceptInvite(userId);
+                      .acceptInvite(selfId);
                 },
                 child: Container(
                   margin: EdgeInsets.all(30.r),
@@ -213,7 +213,7 @@ class _VoiceCallPageState extends State<VoiceCallPage> {
               ),
               InkWell(
                 onTap: () {
-                  if (callStatus == CallStatus.sendering) {
+                  if (callStatus == CallStatus.calling) {
                     //如果在接听中，则是挂断电话
                     Provider.of<Trtc>(context, listen: false).exitRoom();
                   } else {

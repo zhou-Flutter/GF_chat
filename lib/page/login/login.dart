@@ -367,16 +367,16 @@ class _LoginPageState extends State<LoginPage>
               },
               child: isSelect == false
                   ? Container(
-                      height: 25.w,
-                      width: 25.h,
+                      height: 25.r,
+                      width: 25.r,
                       decoration: BoxDecoration(
                         color: Colors.white,
                         borderRadius: BorderRadius.circular(50),
                       ),
                     )
                   : Container(
-                      height: 25.w,
-                      width: 25.h,
+                      height: 25.r,
+                      width: 25.r,
                       child: Image.asset(
                         Constant.assetsImg + "login_sbg.png",
                         fit: BoxFit.fill,

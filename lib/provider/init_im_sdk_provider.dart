@@ -34,6 +34,8 @@ import 'package:tencent_im_sdk_plugin/manager/v2_tim_manager.dart';
 import 'package:tencent_im_sdk_plugin/models/v2_tim_callback.dart';
 import 'package:tencent_im_sdk_plugin/models/v2_tim_conversation.dart';
 import 'package:tencent_im_sdk_plugin/models/v2_tim_conversation_result.dart';
+import 'package:tencent_im_sdk_plugin/models/v2_tim_friend_application.dart';
+import 'package:tencent_im_sdk_plugin/models/v2_tim_friend_info.dart';
 import 'package:tencent_im_sdk_plugin/models/v2_tim_message.dart';
 import 'package:tencent_im_sdk_plugin/models/v2_tim_value_callback.dart';
 import 'package:tencent_im_sdk_plugin/tencent_im_sdk_plugin.dart';
@@ -138,19 +140,26 @@ class InitIMSDKProvider with ChangeNotifier {
           ),
         );
 
-    //添加好友 监听
-    await timManager.getFriendshipManager().addFriendListener(
-          listener: V2TimFriendshipListener(),
-        );
-
     //注册关系链监听器
     await timManager.getFriendshipManager().setFriendListener(
-      listener: V2TimFriendshipListener(
-        onFriendListAdded: (e) {
-          Provider.of<Chat>(context, listen: false).getFriendList();
-        },
-      ),
-    );
+          listener: V2TimFriendshipListener(
+            onFriendListAdded: (List<V2TimFriendInfo> e) {
+              Provider.of<Chat>(context, listen: false).getFriendList();
+
+              Provider.of<Chat>(context, listen: false)
+                  .getFriendApplicationList();
+            },
+            onFriendApplicationListAdded: (List<V2TimFriendApplication> e) {
+              Provider.of<Chat>(context, listen: false)
+                  .getFriendApplicationList();
+            },
+            onFriendApplicationListDeleted: (e) {
+              print("拒绝好友验证");
+              Provider.of<Chat>(context, listen: false)
+                  .getFriendApplicationList();
+            },
+          ),
+        );
   }
 
   //登录
@@ -278,12 +287,6 @@ class InitIMSDKProvider with ChangeNotifier {
      以下是微信登录的逻辑
 
   */
-  //由于微信的原因，暂无法使用微信登录
-
-  /* 
-
-    语音悬浮窗 处理语音通话功能
-  
-   */
+  //由于XX的原因，暂无法使用微信登录
 
 }

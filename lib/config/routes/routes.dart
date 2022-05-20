@@ -1,7 +1,7 @@
 import 'package:fluro/fluro.dart';
 import 'package:flutter/material.dart';
 import 'package:my_chat/config/routes/route_handlers.dart';
-import 'package:my_chat/page/widget.dart/not_found_page.dart';
+import 'package:my_chat/page/widget/not_found_page.dart';
 
 class Routes {
   // 路由管理
@@ -25,7 +25,10 @@ class Routes {
   static String selfQr = "/selfQr"; //二维码界面
   static String setUpPage = "/setUpPage"; //设置界面
   static String permission = "/permission"; //权限
-  static String chatSetting = "/chatSetting"; //权限
+  static String chatSetting = "/chatSetting"; //聊天设置
+  static String blackList = "/blackList"; //黑名单
+  static String consentVerified = "/consentVerified"; //同意验证加好友
+  static String createGroup = "/createGroup"; //创建群聊
 
   static void configureRoutes(FluroRouter router) {
     router.notFoundHandler = Handler(
@@ -52,6 +55,9 @@ class Routes {
     router.define(setUpPage, handler: setUpPageHandler);
     router.define(permission, handler: permissionHandler);
     router.define(chatSetting, handler: chatSettingHandler);
+    router.define(blackList, handler: blackListHandler);
+    router.define(consentVerified, handler: consentVerifiedHandler);
+    router.define(createGroup, handler: createGroupHandler);
   }
 
   // 对参数进行encode，解决参数中有特殊字符

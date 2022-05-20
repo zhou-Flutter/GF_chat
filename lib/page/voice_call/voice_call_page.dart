@@ -1,7 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:my_chat/config/routes/application.dart';
-import 'package:my_chat/page/widget.dart/avatar.dart';
+
+import 'package:my_chat/page/widget/avatar.dart';
 import 'package:my_chat/provider/init_im_sdk_provider.dart';
 import 'package:my_chat/provider/trtc_provider.dart';
 import 'package:my_chat/utils/event_bus.dart';

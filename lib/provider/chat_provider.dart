@@ -5,12 +5,18 @@ import 'package:flutter_easyloading/flutter_easyloading.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:my_chat/config/routes/application.dart';
 import 'package:my_chat/model/tencent_api_resp.dart';
+import 'package:my_chat/utils/error_tips.dart';
 import 'package:my_chat/utils/event_bus.dart';
+import 'package:tencent_im_sdk_plugin/enum/friend_application_type_enum.dart';
+import 'package:tencent_im_sdk_plugin/enum/friend_response_type_enum.dart';
+import 'package:tencent_im_sdk_plugin/enum/friend_type.dart';
 import 'package:tencent_im_sdk_plugin/enum/friend_type_enum.dart';
 import 'package:tencent_im_sdk_plugin/enum/user_info_allow_type.dart';
 import 'package:tencent_im_sdk_plugin/models/v2_tim_callback.dart';
 import 'package:tencent_im_sdk_plugin/models/v2_tim_conversation.dart';
 import 'package:tencent_im_sdk_plugin/models/v2_tim_conversation_result.dart';
+import 'package:tencent_im_sdk_plugin/models/v2_tim_friend_application.dart';
+import 'package:tencent_im_sdk_plugin/models/v2_tim_friend_application_result.dart';
 import 'package:tencent_im_sdk_plugin/models/v2_tim_friend_info.dart';
 import 'package:tencent_im_sdk_plugin/models/v2_tim_friend_info_result.dart';
 import 'package:tencent_im_sdk_plugin/models/v2_tim_friend_operation_result.dart';
@@ -31,6 +37,10 @@ class Chat with ChangeNotifier {
   List<V2TimUserFullInfo> _usersInfo = []; //用户信息
   List<V2TimUserFullInfo> _selfInfo = []; //自己的信息
   List<V2TimFriendInfoResult> _friendInfo = []; //指定好友的信息
+  List<V2TimFriendInfo> _blackList = []; //黑名单
+  int _friendApplicationUnreadCount = 0; //申请好友未读数
+  List<V2TimFriendApplication?>? _applicationList = []; //申请列表
+  V2TimConversation? _v2timConversation; //单个会话信息
 
   List<V2TimMessage> get c2CMsgList => _c2CMsgList;
   List<V2TimConversation> get currentMessageList => _currentMessageList;
@@ -39,6 +49,10 @@ class Chat with ChangeNotifier {
   List<V2TimUserFullInfo> get usersInfo => _usersInfo;
   List<V2TimUserFullInfo> get selfInfo => _selfInfo;
   List<V2TimFriendInfoResult> get friendInfo => _friendInfo;
+  List<V2TimFriendInfo> get blackList => _blackList;
+  int get friendApplicationUnreadCount => _friendApplicationUnreadCount;
+  List<V2TimFriendApplication?>? get applicationList => _applicationList;
+  V2TimConversation? get v2timConversation => _v2timConversation;
 
   //聊天界面的用户 和谁在聊天
   setUserId(userID) {
@@ -90,6 +104,18 @@ class Chat with ChangeNotifier {
         .getConversationManager()
         .deleteConversation(conversationID: conversationID);
     getConversationList();
+  }
+
+  //获取指定 会话的信息
+  getConversation(conversationID) async {
+    V2TimValueCallback<V2TimConversation> res = await TencentImSDKPlugin
+        .v2TIMManager
+        .getConversationManager()
+        .getConversation(conversationID: "c2c_$conversationID");
+    if (res.data != null) {
+      _v2timConversation = res.data;
+    }
+    notifyListeners();
   }
 
   //接收 消息
@@ -345,6 +371,42 @@ class Chat with ChangeNotifier {
     }
   }
 
+  /* 
+    ## 自定义消息
+    ## PROMPT- (不更新会话的提示类 自定义信息)
+    ## CONCISE- (不更新会话的自我介绍 自定义信息)
+    ## VOICECALL- (不更新未读数的语音通话 自定义信息)
+
+  */
+  sendCustomMsg(String msgtext, userID, isAm, isExcludedFromLastMessage) async {
+    V2TimValueCallback<V2TimMsgCreateInfoResult> createMessage =
+        await TencentImSDKPlugin.v2TIMManager
+            .getMessageManager()
+            .createCustomMessage(data: msgtext);
+    String id = createMessage.data!.id!; // 返回的消息创建id
+
+    _c2CMsgList.insert(0, createMessage.data!.messageInfo!);
+    eventBus.fire(UpdateChatPageEvent(_c2CMsgList, isAm));
+
+    V2TimValueCallback<V2TimMessage> res =
+        await TencentImSDKPlugin.v2TIMManager.getMessageManager().sendMessage(
+              id: id, // 将消息创建id传递给
+              receiver: userID,
+              groupID: "",
+              isExcludedFromUnreadCount: true,
+              isExcludedFromLastMessage: isExcludedFromLastMessage,
+            );
+
+    if (res.data != null) {
+      for (int i = 0; i < _c2CMsgList.length; i++) {
+        if (_c2CMsgList[i].id == res.data!.id) {
+          _c2CMsgList[i] = res.data!;
+          eventBus.fire(UpdateChatPageEvent(_c2CMsgList, isAm));
+        }
+      }
+    }
+  }
+
 /* 
 
 
@@ -416,19 +478,41 @@ class Chat with ChangeNotifier {
   }
 
   //添加好友
-  addFriend(userID, context) async {
+  addFriend(userID, context, addWording) async {
     EasyLoading.show(status: '正在发送...');
     V2TimValueCallback<V2TimFriendOperationResult> res =
         await TencentImSDKPlugin.v2TIMManager.getFriendshipManager().addFriend(
-            userID: userID, addType: FriendTypeEnum.V2TIM_FRIEND_TYPE_BOTH);
+              userID: userID,
+              addType: FriendTypeEnum.V2TIM_FRIEND_TYPE_BOTH,
+              addWording: addWording,
+            );
     if (res.data!.resultCode == 0) {
-      EasyLoading.dismiss();
-      Application.router.pop(context);
       Fluttertoast.showToast(msg: "发送成功");
-    } else if (res.data!.resultCode == 30001) {
-      EasyLoading.dismiss();
-      Application.router.pop(context);
-      Fluttertoast.showToast(msg: "该好友已添加到通讯录");
+    } else {
+      ErrorTips.errorMsg(res.data!.resultCode);
+    }
+    EasyLoading.dismiss();
+    Application.router.pop(context);
+  }
+
+  //删除 单个 好友
+  deleteFromFriendList(userID, context) async {
+    V2TimValueCallback<List<V2TimFriendOperationResult>> res =
+        await TencentImSDKPlugin.v2TIMManager
+            .getFriendshipManager()
+            .deleteFromFriendList(
+                userIDList: [userID],
+                deleteType: FriendTypeEnum.V2TIM_FRIEND_TYPE_SINGLE);
+    if (res.data != null) {
+      deleteConversation("c2c_$userID");
+      Application.router.navigateTo(
+        context,
+        "/bottomNav",
+        clearStack: true,
+        transition: TransitionType.inFromRight,
+      );
+    } else {
+      Fluttertoast.showToast(msg: "删除失败");
     }
   }
 
@@ -455,5 +539,82 @@ class Chat with ChangeNotifier {
     } else {
       _selfInfo = [];
     }
+  }
+
+  //获取黑名单
+  getBlackList() async {
+    V2TimValueCallback<List<V2TimFriendInfo>> res = await TencentImSDKPlugin
+        .v2TIMManager
+        .getFriendshipManager()
+        .getBlackList();
+    if (res.data != null) {
+      _blackList = res.data!;
+      notifyListeners();
+    }
+  }
+
+  //获取好友申请列表
+  getFriendApplicationList() async {
+    V2TimValueCallback<V2TimFriendApplicationResult> res =
+        await TencentImSDKPlugin.v2TIMManager
+            .getFriendshipManager()
+            .getFriendApplicationList();
+    if (res.data != null) {
+      _friendApplicationUnreadCount = res.data!.unreadCount!;
+      _applicationList = res.data!.friendApplicationList;
+    }
+    notifyListeners();
+  }
+
+  // 同意好友申请
+  acceptFriendApplication(userID, context) async {
+    EasyLoading.show(status: '加载中...');
+    V2TimValueCallback<V2TimFriendOperationResult> res =
+        await TencentImSDKPlugin.v2TIMManager
+            .getFriendshipManager()
+            .acceptFriendApplication(
+              responseType:
+                  FriendResponseTypeEnum.V2TIM_FRIEND_ACCEPT_AGREE_AND_ADD,
+              type: FriendApplicationTypeEnum.V2TIM_FRIEND_APPLICATION_COME_IN,
+              userID: userID,
+            );
+    if (res.data!.resultCode == 0) {
+      Fluttertoast.showToast(msg: "添加成功");
+      sendTextMsg("我通过了你的请求", userID, false);
+      //发送不更新会话的消息
+      sendCustomMsg("PROMPT-你们已经是好友了", userID, false, true);
+      Application.router.navigateTo(
+        context,
+        "/bottomNav",
+        clearStack: true,
+        transition: TransitionType.inFromRight,
+      );
+    }
+    EasyLoading.dismiss();
+  }
+
+  //拒绝好友申请
+  refuseFriendApplication(userID) async {
+    await TencentImSDKPlugin.v2TIMManager
+        .getFriendshipManager()
+        .refuseFriendApplication(
+          type: FriendApplicationTypeEnum.V2TIM_FRIEND_APPLICATION_COME_IN,
+          userID: userID,
+        );
+  }
+
+  //设置好友申请已读
+  setFriendApplicationRead() async {
+    await TencentImSDKPlugin.v2TIMManager
+        .getFriendshipManager()
+        .setFriendApplicationRead();
+    getFriendApplicationList();
+  }
+
+  //修改好友信息 备注等信息
+  setFriendInfo(userID, friendRemark) async {
+    await TencentImSDKPlugin.v2TIMManager
+        .getFriendshipManager()
+        .setFriendInfo(userID: userID, friendRemark: friendRemark);
   }
 }

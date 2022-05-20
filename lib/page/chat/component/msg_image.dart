@@ -5,7 +5,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:loading_indicator/loading_indicator.dart';
 import 'package:my_chat/config/routes/application.dart';
-import 'package:my_chat/page/widget.dart/avatar.dart';
+import 'package:my_chat/page/widget/avatar.dart';
 import 'package:tencent_im_sdk_plugin/models/v2_tim_image.dart';
 import 'package:tencent_im_sdk_plugin/models/v2_tim_message.dart';
 
@@ -161,6 +161,8 @@ class _MsgImageState extends State<MsgImage> {
             },
             child: isShowNetImg == false
                 ? Container(
+                    constraints:
+                        BoxConstraints(minHeight: 100.r, minWidth: 70.r),
                     width: imgWidth,
                     height: imgHeight,
                     child: ClipRRect(
@@ -169,6 +171,8 @@ class _MsgImageState extends State<MsgImage> {
                     ),
                   )
                 : Container(
+                    constraints:
+                        BoxConstraints(minHeight: 100.r, minWidth: 70.r),
                     width: imgWidth,
                     height: imgHeight,
                     child: ClipRRect(

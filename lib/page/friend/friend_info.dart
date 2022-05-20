@@ -3,7 +3,8 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:my_chat/config/routes/application.dart';
-import 'package:my_chat/page/widget.dart/avatar.dart';
+
+import 'package:my_chat/page/widget/avatar.dart';
 import 'package:my_chat/provider/chat_provider.dart';
 import 'package:my_chat/utils/commons.dart';
 import 'package:my_chat/utils/constant.dart';
@@ -65,11 +66,11 @@ class _FriendInfoPageState extends State<FriendInfoPage> {
               )
             : Column(
                 children: [
-                  Info(_friendInfo!),
+                  info(_friendInfo!),
                   SizedBox(height: 30.h),
                   Container(
                     child: _friendInfo!.relation == 0
-                        ? Additem()
+                        ? additem()
                         : sendFriendMsg(),
                   )
                 ],
@@ -79,7 +80,7 @@ class _FriendInfoPageState extends State<FriendInfoPage> {
   }
 
   // 头部信息
-  Widget Info(V2TimFriendInfoResult info) {
+  Widget info(V2TimFriendInfoResult info) {
     return Container(
       color: Colors.white,
       padding: EdgeInsets.symmetric(horizontal: 40.r, vertical: 40.r),
@@ -140,7 +141,7 @@ class _FriendInfoPageState extends State<FriendInfoPage> {
   }
 
   // 添加好友 打电话 的列表
-  Widget Additem() {
+  Widget additem() {
     return Container(
       color: Colors.white,
       child: Column(

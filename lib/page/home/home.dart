@@ -11,7 +11,9 @@ import 'package:fluttertoast/fluttertoast.dart';
 import 'package:my_chat/config/routes/application.dart';
 import 'package:my_chat/main.dart';
 import 'package:my_chat/page/home/component/slider_item.dart';
-import 'package:my_chat/page/widget.dart/avatar.dart';
+
+import 'package:my_chat/page/widget/avatar.dart';
+import 'package:my_chat/page/widget/popup_menu.dart';
 import 'package:my_chat/provider/chat_provider.dart';
 import 'package:my_chat/provider/init_im_sdk_provider.dart';
 import 'package:my_chat/utils/color_tools.dart';
@@ -40,8 +42,6 @@ class Home extends StatefulWidget {
 class _HomeState extends State<Home> {
   final RefreshController _refreshController =
       RefreshController(initialRefresh: false);
-  late List<ItemModel> menuItems;
-  final CustomPopupMenuController _controller = CustomPopupMenuController();
 
   List<V2TimConversation> currentMessageList = [];
 
@@ -51,49 +51,8 @@ class _HomeState extends State<Home> {
   void initState() {
     super.initState();
 
-    menuItems = [
-      ItemModel(
-        '发起群聊',
-        IconData(0xe611, fontFamily: "icons"),
-      ),
-      ItemModel(
-        '添加朋友',
-        IconData(0xe8ca, fontFamily: "icons"),
-      ),
-      ItemModel(
-        '扫一扫',
-        IconData(0xe605, fontFamily: "icons"),
-      ),
-      ItemModel(
-        '帮助与反馈',
-        IconData(0xe600, fontFamily: "icons"),
-      ),
-    ];
-
     Provider.of<Chat>(context, listen: false).getConversationList();
     selfInfo = Provider.of<Chat>(context, listen: false).selfInfo;
-  }
-
-  _menuToPage(title) {
-    switch (title) {
-      case "发起群聊":
-        Fluttertoast.showToast(msg: "该功能还在开发中...");
-        break;
-      case "添加朋友":
-        Application.router.navigateTo(
-          context,
-          "/addFriendPage",
-          transition: TransitionType.inFromRight,
-        );
-        break;
-      case "扫一扫":
-        Fluttertoast.showToast(msg: "该功能还在开发中...");
-        break;
-      case "帮助与反馈":
-        Fluttertoast.showToast(msg: "该功能还在开发中...");
-        break;
-      default:
-    }
   }
 
   _onRefresh() {
@@ -114,20 +73,7 @@ class _HomeState extends State<Home> {
           style: TextStyle(fontSize: 35.sp),
         ),
         actions: <Widget>[
-          CustomPopupMenu(
-            child: Container(
-              child: Icon(
-                IconData(0xe635, fontFamily: "icons"),
-                color: Colors.black87,
-                size: 40.r,
-              ),
-              padding: EdgeInsets.symmetric(horizontal: 35.r),
-            ),
-            menuBuilder: () => popupMenu(),
-            pressType: PressType.singleClick,
-            verticalMargin: -10,
-            controller: _controller,
-          ),
+          PopupMenu(),
         ],
       ),
       body: SingleChildScrollView(
@@ -146,58 +92,6 @@ class _HomeState extends State<Home> {
                     },
                   ),
           ],
-        ),
-      ),
-    );
-  }
-
-  //弹出菜单
-  Widget popupMenu() {
-    return ClipRRect(
-      borderRadius: BorderRadius.circular(15.r),
-      child: Container(
-        color: const Color(0xFF4C4C4C),
-        child: IntrinsicWidth(
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.stretch,
-            children: menuItems
-                .map(
-                  (item) => GestureDetector(
-                    behavior: HitTestBehavior.translucent,
-                    onTap: () {
-                      _menuToPage(item.title);
-                      _controller.hideMenu();
-                    },
-                    child: Container(
-                      height: 80.h,
-                      padding: EdgeInsets.symmetric(horizontal: 40.r),
-                      child: Row(
-                        children: <Widget>[
-                          Icon(
-                            item.icon,
-                            size: 40.r,
-                            color: Colors.white,
-                          ),
-                          Expanded(
-                            child: Container(
-                              margin: EdgeInsets.only(left: 20.r, right: 20.r),
-                              padding: EdgeInsets.symmetric(vertical: 20.r),
-                              child: Text(
-                                item.title,
-                                style: TextStyle(
-                                  color: Colors.white,
-                                  fontSize: 28.sp,
-                                ),
-                              ),
-                            ),
-                          ),
-                        ],
-                      ),
-                    ),
-                  ),
-                )
-                .toList(),
-          ),
         ),
       ),
     );

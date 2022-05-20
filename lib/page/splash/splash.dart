@@ -9,7 +9,8 @@ import 'package:flutter/scheduler.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:my_chat/config/routes/application.dart';
-import 'package:my_chat/page/widget.dart/agreement_dialog.dart';
+import 'package:my_chat/page/widget/agreement_dialog.dart';
+
 import 'package:my_chat/provider/common_provider.dart';
 import 'package:my_chat/provider/init_im_sdk_provider.dart';
 import 'package:my_chat/utils/constant.dart';

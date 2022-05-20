@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:loading_indicator/loading_indicator.dart';
-import 'package:my_chat/page/widget.dart/avatar.dart';
+import 'package:my_chat/page/widget/avatar.dart';
 
 import 'package:tencent_im_sdk_plugin/models/v2_tim_message.dart';
 
@@ -10,18 +10,18 @@ import 'package:tencent_im_sdk_plugin/models/v2_tim_message.dart';
    自定义表情包
 
  */
-class customEmo extends StatefulWidget {
+class MsgEmo extends StatefulWidget {
   V2TimMessage? item;
-  customEmo({
+  MsgEmo({
     this.item,
     Key? key,
   }) : super(key: key);
 
   @override
-  State<customEmo> createState() => _customEmoState();
+  State<MsgEmo> createState() => _MsgEmoState();
 }
 
-class _customEmoState extends State<customEmo> {
+class _MsgEmoState extends State<MsgEmo> {
   var textMsg = "";
   var imagepath = "";
   var imgHeight;

@@ -6,7 +6,8 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 // import 'package:flutter_sound/public/flutter_sound_player.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:loading_indicator/loading_indicator.dart';
-import 'package:my_chat/page/widget.dart/avatar.dart';
+
+import 'package:my_chat/page/widget/avatar.dart';
 import 'package:my_chat/provider/chat_provider.dart';
 import 'package:my_chat/utils/color_tools.dart';
 import 'package:my_chat/utils/constant.dart';

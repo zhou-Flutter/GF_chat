@@ -49,6 +49,8 @@ class BottomNavState extends State<BottomNav>
     _controller = PageController(initialPage: 0);
     var userId = Provider.of<InitIMSDKProvider>(context, listen: false).selfId;
     Provider.of<Chat>(context, listen: false).getUnreadCount();
+    Provider.of<Chat>(context, listen: false)
+        .getFriendApplicationList(); //获取好友申请列表
     Provider.of<Chat>(context, listen: false).getFriendList(); //获取好友列表
     Provider.of<Chat>(context, listen: false).getSelfInfo(userId);
     Provider.of<Common>(context, listen: false).getSoundPathName();
@@ -76,7 +78,10 @@ class BottomNavState extends State<BottomNav>
   @override
   Widget build(BuildContext context) {
     int unreadCount = context.watch<Chat>().unreadCount;
+    int friendApplicationUnreadCount =
+        context.watch<Chat>().friendApplicationUnreadCount;
     butIcon[0]["unRead"] = unreadCount;
+    butIcon[1]["unRead"] = friendApplicationUnreadCount;
     _bottomNavBarList = [
       _bottomNavBarItem(butIcon[0]),
       _bottomNavBarItem(butIcon[1]),

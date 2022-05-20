@@ -22,6 +22,8 @@ class _SendAddPageState extends State<SendAddPage> {
   TextEditingController _textEditingcontroller = TextEditingController();
   TextEditingController _textEditingcontroller1 = TextEditingController();
 
+  String? addWording;
+
   @override
   void initState() {
     // TODO: implement initState
@@ -97,6 +99,9 @@ class _SendAddPageState extends State<SendAddPage> {
               decoration: const InputDecoration(
                 border: InputBorder.none,
               ),
+              onChanged: (e) {
+                addWording = e;
+              },
             ),
           )
         ],
@@ -147,8 +152,11 @@ class _SendAddPageState extends State<SendAddPage> {
   Widget send() {
     return InkWell(
       onTap: () {
-        Provider.of<Chat>(context, listen: false)
-            .addFriend(widget.userID, context);
+        Provider.of<Chat>(context, listen: false).addFriend(
+          widget.userID,
+          context,
+          addWording,
+        );
       },
       child: Container(
         alignment: Alignment.center,

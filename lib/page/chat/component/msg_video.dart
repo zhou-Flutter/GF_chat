@@ -5,7 +5,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:loading_indicator/loading_indicator.dart';
 import 'package:my_chat/config/routes/application.dart';
-import 'package:my_chat/page/widget.dart/avatar.dart';
+import 'package:my_chat/page/widget/avatar.dart';
+
 import 'package:my_chat/utils/relative_date_format.dart';
 import 'package:tencent_im_sdk_plugin/models/v2_tim_message.dart';
 

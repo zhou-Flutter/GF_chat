@@ -10,13 +10,15 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 
 import 'package:loading_indicator/loading_indicator.dart';
 import 'package:my_chat/config/routes/application.dart';
-import 'package:my_chat/page/chat/component/msg_custom_emo.dart';
+import 'package:my_chat/page/chat/component/msg_custom.dart';
+import 'package:my_chat/page/chat/component/msg_emo.dart';
 import 'package:my_chat/page/chat/component/input_box.dart';
 import 'package:my_chat/page/chat/component/msg_image.dart';
 import 'package:my_chat/page/chat/component/msg_text.dart';
 import 'package:my_chat/page/chat/component/msg_video.dart';
 import 'package:my_chat/page/chat/component/msg_voice.dart';
-import 'package:my_chat/page/widget.dart/agreement_dialog.dart';
+
+import 'package:my_chat/page/widget/agreement_dialog.dart';
 
 import 'package:my_chat/provider/chat_provider.dart';
 import 'package:my_chat/utils/color_tools.dart';
@@ -119,6 +121,11 @@ class _ChatDetailPageState extends State<ChatDetailPage> {
                   context,
                   "/chatSetting",
                   transition: TransitionType.inFromRight,
+                  routeSettings: RouteSettings(
+                    arguments: {
+                      "userID": widget.userID,
+                    },
+                  ),
                 );
               }),
         ],
@@ -243,12 +250,12 @@ class _ChatDetailPageState extends State<ChatDetailPage> {
   Widget content(V2TimMessage item) {
     switch (item.elemType) {
       case MessageElemType.V2TIM_ELEM_TYPE_TEXT:
-        // textMsg = "[自定义消息]";
+        // textMsg = "[文本]";
         return TextMsg(item: item);
 
       case MessageElemType.V2TIM_ELEM_TYPE_CUSTOM:
         // textMsg = "[自定义消息]";
-        return Container();
+        return MsgCustom(item: item);
 
       case MessageElemType.V2TIM_ELEM_TYPE_IMAGE:
         // textMsg = "[图片]";
@@ -268,7 +275,7 @@ class _ChatDetailPageState extends State<ChatDetailPage> {
 
       case MessageElemType.V2TIM_ELEM_TYPE_FACE:
         // textMsg = "[表情包]";
-        return customEmo(item: item);
+        return MsgEmo(item: item);
 
       default:
         return Container();

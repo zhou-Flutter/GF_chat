@@ -29,6 +29,9 @@ class Routes {
   static String blackList = "/blackList"; //黑名单
   static String consentVerified = "/consentVerified"; //同意验证加好友
   static String createGroup = "/createGroup"; //创建群聊
+  static String groupList = "/groupList"; //群聊列表
+  static String groupChatPage = "/groupChatPage"; //群聊页面
+  static String groupChatSetting = "/groupChatSetting"; //群聊设置
 
   static void configureRoutes(FluroRouter router) {
     router.notFoundHandler = Handler(
@@ -58,6 +61,9 @@ class Routes {
     router.define(blackList, handler: blackListHandler);
     router.define(consentVerified, handler: consentVerifiedHandler);
     router.define(createGroup, handler: createGroupHandler);
+    router.define(groupList, handler: groupListHandler);
+    router.define(groupChatPage, handler: groupChatPageHandler);
+    router.define(groupChatSetting, handler: groupChatSettingHandler);
   }
 
   // 对参数进行encode，解决参数中有特殊字符

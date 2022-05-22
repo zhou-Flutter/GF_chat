@@ -11,11 +11,13 @@ import 'package:provider/src/provider.dart';
 import 'package:text_span_field/text_span_builder.dart';
 
 class EmoTicon extends StatefulWidget {
-  String? userID;
+  String converID;
+  bool isGroup;
   TextSpanBuilder textSpanBuilder;
   EmoTicon({
     required this.textSpanBuilder,
-    this.userID,
+    required this.converID,
+    required this.isGroup,
     Key? key,
   }) : super(key: key);
 
@@ -281,8 +283,11 @@ class _EmoTiconState extends State<EmoTicon>
                   return InkWell(
                     onTap: () {
                       String customEmoText = "-CUSTOM-EMO-$index";
-                      Provider.of<Chat>(context, listen: false)
-                          .sendFaceMsg(index, customEmoText, widget.userID);
+                      Provider.of<Chat>(context, listen: false).createFaceMsg(
+                          index,
+                          customEmoText,
+                          widget.converID,
+                          widget.isGroup);
                     },
                     child: Container(
                       padding: EdgeInsets.all(20.r),

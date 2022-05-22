@@ -12,9 +12,11 @@ import 'package:tencent_im_sdk_plugin/models/v2_tim_message.dart';
 
 class MsgVideo extends StatefulWidget {
   V2TimMessage? item;
+  bool isGroup;
 
   MsgVideo({
     this.item,
+    required this.isGroup,
     Key? key,
   }) : super(key: key);
 
@@ -149,74 +151,96 @@ class _MsgVideoState extends State<MsgVideo> {
           SizedBox(
             width: 25.w,
           ),
-          InkWell(
-            onTap: () {
-              Application.router.navigateTo(
-                context,
-                "/videoPlay",
-                transition: TransitionType.inFromRight,
-                routeSettings: RouteSettings(
-                  arguments: {
-                    "videoMessage": widget.item,
-                  },
-                ),
-              );
-            },
-            child: Stack(
-              alignment: Alignment.center,
-              children: [
-                isShowNetImg == false
-                    ? Container(
-                        width: imgWidth,
-                        height: imgHeight,
-                        child: ClipRRect(
-                          borderRadius: BorderRadius.circular(15.r), //弧度
-                          child:
-                              Image.file(File(snapshotPath), fit: BoxFit.fill),
+          Column(
+            crossAxisAlignment: widget.item!.isSelf == true
+                ? CrossAxisAlignment.end
+                : CrossAxisAlignment.start,
+            children: [
+              widget.isGroup == true
+                  ? widget.item!.isSelf == true
+                      ? Container()
+                      : Container(
+                          width: 100.w,
+                          padding: EdgeInsets.only(
+                              left: 15.r, bottom: 10.r, right: 15.r),
+                          child: Text(
+                            widget.item!.nickName!,
+                            overflow: TextOverflow.ellipsis,
+                            style: TextStyle(
+                                color: Colors.black45, fontSize: 24.sp),
+                          ),
+                        )
+                  : Container(),
+              InkWell(
+                onTap: () {
+                  Application.router.navigateTo(
+                    context,
+                    "/videoPlay",
+                    transition: TransitionType.inFromRight,
+                    routeSettings: RouteSettings(
+                      arguments: {
+                        "videoMessage": widget.item,
+                      },
+                    ),
+                  );
+                },
+                child: Stack(
+                  alignment: Alignment.center,
+                  children: [
+                    isShowNetImg == false
+                        ? Container(
+                            width: imgWidth,
+                            height: imgHeight,
+                            child: ClipRRect(
+                              borderRadius: BorderRadius.circular(15.r), //弧度
+                              child: Image.file(File(snapshotPath),
+                                  fit: BoxFit.fill),
+                            ),
+                          )
+                        : Container(
+                            width: imgWidth,
+                            height: imgHeight,
+                            child: ClipRRect(
+                              borderRadius: BorderRadius.circular(15.r), //弧度
+                              child: Image.network(
+                                  widget.item!.videoElem!.snapshotUrl!,
+                                  fit: BoxFit.fill),
+                            ),
+                          ),
+                    Positioned(
+                      child: Container(
+                        height: 50.r,
+                        width: 50.r,
+                        decoration: BoxDecoration(
+                          color: Colors.black12,
+                          border: Border.all(color: Colors.white, width: 2.r),
+                          borderRadius: BorderRadius.circular(50.r),
                         ),
-                      )
-                    : Container(
-                        width: imgWidth,
-                        height: imgHeight,
-                        child: ClipRRect(
-                          borderRadius: BorderRadius.circular(15.r), //弧度
-                          child: Image.network(
-                              widget.item!.videoElem!.snapshotUrl!,
-                              fit: BoxFit.fill),
+                        child: Icon(
+                          Icons.play_arrow,
+                          color: Colors.white,
+                          size: 35.r,
                         ),
                       ),
-                Positioned(
-                  child: Container(
-                    height: 50.r,
-                    width: 50.r,
-                    decoration: BoxDecoration(
-                      color: Colors.black12,
-                      border: Border.all(color: Colors.white, width: 2.r),
-                      borderRadius: BorderRadius.circular(50.r),
                     ),
-                    child: Icon(
-                      Icons.play_arrow,
-                      color: Colors.white,
-                      size: 35.r,
-                    ),
-                  ),
-                ),
-                Positioned(
-                  bottom: 0,
-                  right: 0,
-                  child: Container(
-                    padding: EdgeInsets.all(5.r),
-                    child: Text(
-                      time,
-                      style: TextStyle(
-                        color: Colors.white,
-                        fontSize: 20.sp,
+                    Positioned(
+                      bottom: 0,
+                      right: 0,
+                      child: Container(
+                        padding: EdgeInsets.all(5.r),
+                        child: Text(
+                          time,
+                          style: TextStyle(
+                            color: Colors.white,
+                            fontSize: 20.sp,
+                          ),
+                        ),
                       ),
-                    ),
-                  ),
-                )
-              ],
-            ),
+                    )
+                  ],
+                ),
+              ),
+            ],
           ),
           Container(
             alignment: Alignment.center,

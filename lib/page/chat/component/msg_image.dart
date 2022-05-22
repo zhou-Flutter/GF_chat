@@ -11,8 +11,10 @@ import 'package:tencent_im_sdk_plugin/models/v2_tim_message.dart';
 
 class MsgImage extends StatefulWidget {
   V2TimMessage? item;
+  bool isGroup;
   MsgImage({
     this.item,
+    required this.isGroup,
     Key? key,
   }) : super(key: key);
 
@@ -146,40 +148,62 @@ class _MsgImageState extends State<MsgImage> {
           SizedBox(
             width: 25.w,
           ),
-          InkWell(
-            onTap: () {
-              Application.router.navigateTo(
-                context,
-                "/photosView",
-                transition: TransitionType.inFromRight,
-                routeSettings: RouteSettings(
-                  arguments: {
-                    "message": widget.item,
-                  },
-                ),
-              );
-            },
-            child: isShowNetImg == false
-                ? Container(
-                    constraints:
-                        BoxConstraints(minHeight: 100.r, minWidth: 70.r),
-                    width: imgWidth,
-                    height: imgHeight,
-                    child: ClipRRect(
-                      borderRadius: BorderRadius.circular(15.r), //弧度
-                      child: Image.file(File(imagepath), fit: BoxFit.fill),
+          Column(
+            crossAxisAlignment: widget.item!.isSelf == true
+                ? CrossAxisAlignment.end
+                : CrossAxisAlignment.start,
+            children: [
+              widget.isGroup == true
+                  ? widget.item!.isSelf == true
+                      ? Container()
+                      : Container(
+                          width: 100.w,
+                          padding: EdgeInsets.only(
+                              left: 15.r, bottom: 10.r, right: 15.r),
+                          child: Text(
+                            widget.item!.nickName!,
+                            overflow: TextOverflow.ellipsis,
+                            style: TextStyle(
+                                color: Colors.black45, fontSize: 24.sp),
+                          ),
+                        )
+                  : Container(),
+              InkWell(
+                onTap: () {
+                  Application.router.navigateTo(
+                    context,
+                    "/photosView",
+                    transition: TransitionType.inFromRight,
+                    routeSettings: RouteSettings(
+                      arguments: {
+                        "message": widget.item,
+                      },
                     ),
-                  )
-                : Container(
-                    constraints:
-                        BoxConstraints(minHeight: 100.r, minWidth: 70.r),
-                    width: imgWidth,
-                    height: imgHeight,
-                    child: ClipRRect(
-                      borderRadius: BorderRadius.circular(15.r), //弧度
-                      child: Image.network(netImg!.url!, fit: BoxFit.fill),
-                    ),
-                  ),
+                  );
+                },
+                child: isShowNetImg == false
+                    ? Container(
+                        constraints:
+                            BoxConstraints(minHeight: 100.r, minWidth: 70.r),
+                        width: imgWidth,
+                        height: imgHeight,
+                        child: ClipRRect(
+                          borderRadius: BorderRadius.circular(15.r), //弧度
+                          child: Image.file(File(imagepath), fit: BoxFit.fill),
+                        ),
+                      )
+                    : Container(
+                        constraints:
+                            BoxConstraints(minHeight: 100.r, minWidth: 70.r),
+                        width: imgWidth,
+                        height: imgHeight,
+                        child: ClipRRect(
+                          borderRadius: BorderRadius.circular(15.r), //弧度
+                          child: Image.network(netImg!.url!, fit: BoxFit.fill),
+                        ),
+                      ),
+              ),
+            ],
           ),
           Container(
             alignment: Alignment.center,

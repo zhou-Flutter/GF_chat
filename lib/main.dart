@@ -12,6 +12,7 @@ import 'package:my_chat/config/routes/routes.dart';
 import 'package:my_chat/config/style/app_theme.dart';
 import 'package:my_chat/provider/chat_provider.dart';
 import 'package:my_chat/provider/common_provider.dart';
+import 'package:my_chat/provider/group_chat_provider.dart';
 import 'package:my_chat/provider/init_im_sdk_provider.dart';
 import 'package:my_chat/provider/trtc_provider.dart';
 import 'package:my_chat/utils/commons.dart';
@@ -95,6 +96,9 @@ class _MyChatAppState extends State<MyChatApp> with WidgetsBindingObserver {
           ),
           ChangeNotifierProvider(
             create: (_) => Trtc(),
+          ),
+          ChangeNotifierProvider(
+            create: (_) => GroupChat(),
           ),
         ],
         child: RefreshConfiguration(

@@ -5,7 +5,7 @@ import 'package:my_chat/page/bottomtab/bottom_navigation.dart';
 import 'package:my_chat/page/chat/chat_detail.dart';
 import 'package:my_chat/page/chat/component/photo_view.dart';
 import 'package:my_chat/page/chat/component/video_play.dart';
-import 'package:my_chat/page/chat_setting/chat_setting.dart';
+import 'package:my_chat/page/chat/chat_setting.dart';
 import 'package:my_chat/page/contacts/blacklist.dart';
 import 'package:my_chat/page/contacts/consent_verified.dart';
 import 'package:my_chat/page/friend/add_friend.dart';
@@ -15,6 +15,9 @@ import 'package:my_chat/page/friend/send_add_page.dart';
 import 'package:my_chat/page/friend/friend_info.dart';
 import 'package:my_chat/page/contacts/friend_new.dart';
 import 'package:my_chat/page/group/create_group.dart';
+import 'package:my_chat/page/group/group_chat.dart';
+import 'package:my_chat/page/group/group_chat_setting.dart';
+import 'package:my_chat/page/group/group_list.dart';
 
 import 'package:my_chat/page/login/login.dart';
 import 'package:my_chat/page/login/mobile_num_login.dart';
@@ -151,4 +154,26 @@ var consentVerifiedHandler = Handler(
 var createGroupHandler = Handler(
     handlerFunc: (BuildContext? context, Map<String, List<String>> params) {
   return CreateGroup();
+});
+
+var groupListHandler = Handler(
+    handlerFunc: (BuildContext? context, Map<String, List<String>> params) {
+  return GroupList();
+});
+
+var groupChatPageHandler = Handler(
+    handlerFunc: (BuildContext? context, Map<String, List<String>> params) {
+  final args = context?.settings?.arguments as Map;
+  return GroupChatPage(
+    groupID: args['groupID'],
+    showName: args['showName'],
+  );
+});
+
+var groupChatSettingHandler = Handler(
+    handlerFunc: (BuildContext? context, Map<String, List<String>> params) {
+  final args = context?.settings?.arguments as Map;
+  return GroupChatSetting(
+    groupID: args['groupID'],
+  );
 });

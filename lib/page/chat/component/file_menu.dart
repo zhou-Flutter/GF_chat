@@ -13,9 +13,12 @@ import 'package:provider/provider.dart';
 import 'package:video_player/video_player.dart';
 
 class FileMenu extends StatefulWidget {
-  String? userID;
+  String converID;
+  bool isGroup;
+
   FileMenu({
-    this.userID,
+    required this.converID,
+    required this.isGroup,
     Key? key,
   }) : super(key: key);
 
@@ -142,7 +145,7 @@ class _FileMenuState extends State<FileMenu> {
         if (imageSize > res[i].size) {
           print(res[i].path);
           Provider.of<Chat>(context, listen: false)
-              .sendImageMsg(res[i].path, widget.userID);
+              .sendImageMsg(res[i].path, widget.converID, widget.isGroup);
         } else {
           Fluttertoast.showToast(msg: "图片太大，无法发送");
         }
@@ -160,7 +163,7 @@ class _FileMenuState extends State<FileMenu> {
         if (imageSize > res[i].size) {
           print(res[i].path);
           Provider.of<Chat>(context, listen: false)
-              .sendImageMsg(res[i].path, widget.userID);
+              .sendImageMsg(res[i].path, widget.converID, widget.isGroup);
         } else {
           Fluttertoast.showToast(msg: "图片太大，无法发送");
         }
@@ -185,7 +188,12 @@ class _FileMenuState extends State<FileMenu> {
             seconds = controller.value.duration.inSeconds;
 
             Provider.of<Chat>(context, listen: false).sendVideoMsg(
-                res[i].path, "mp4", seconds, res[i].thumbPath!, widget.userID);
+                res[i].path,
+                "mp4",
+                seconds,
+                res[i].thumbPath!,
+                widget.converID,
+                widget.isGroup);
           });
         } else {
           Fluttertoast.showToast(msg: "视频太大，无法发送");
@@ -202,7 +210,7 @@ class _FileMenuState extends State<FileMenu> {
       Fluttertoast.showToast(msg: "已在通话中。。。");
     } else {
       Provider.of<Trtc>(context, listen: false)
-          .enterRoom(widget.userID!, selfId);
+          .enterRoom(widget.converID, selfId);
     }
   }
 }

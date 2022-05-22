@@ -1,81 +1,65 @@
 import 'package:audioplayers/audioplayers.dart';
-import 'package:custom_pop_up_menu/custom_pop_up_menu.dart';
 import 'package:extended_list/extended_list.dart';
 import 'package:fluro/fluro.dart';
-
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_easyrefresh/easy_refresh.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
-
-import 'package:loading_indicator/loading_indicator.dart';
 import 'package:my_chat/config/routes/application.dart';
+import 'package:my_chat/page/chat/component/input_box.dart';
 import 'package:my_chat/page/chat/component/msg_custom.dart';
 import 'package:my_chat/page/chat/component/msg_emo.dart';
-import 'package:my_chat/page/chat/component/input_box.dart';
 import 'package:my_chat/page/chat/component/msg_image.dart';
 import 'package:my_chat/page/chat/component/msg_text.dart';
 import 'package:my_chat/page/chat/component/msg_video.dart';
 import 'package:my_chat/page/chat/component/msg_voice.dart';
-
 import 'package:my_chat/page/widget/agreement_dialog.dart';
-
 import 'package:my_chat/provider/chat_provider.dart';
+import 'package:my_chat/provider/group_chat_provider.dart';
 import 'package:my_chat/utils/color_tools.dart';
 import 'package:my_chat/utils/commons.dart';
-import 'package:my_chat/utils/constant.dart';
 import 'package:my_chat/utils/event_bus.dart';
-
 import 'package:my_chat/utils/relative_date_format.dart';
 import 'package:provider/provider.dart';
 import 'package:tencent_im_sdk_plugin/enum/message_elem_type.dart';
-import 'package:tencent_im_sdk_plugin/models/v2_tim_conversation.dart';
-
 import 'package:tencent_im_sdk_plugin/models/v2_tim_message.dart';
 
-import 'dart:async';
-
-import 'package:flutter_spinkit/flutter_spinkit.dart';
-
-class ChatDetailPage extends StatefulWidget {
-  String? userID;
+class GroupChatPage extends StatefulWidget {
+  String? groupID;
   String? showName;
-  ChatDetailPage({
+  GroupChatPage({
     Key? key,
-    this.userID,
+    this.groupID,
     this.showName,
   }) : super(key: key);
 
   @override
-  State<ChatDetailPage> createState() => _ChatDetailPageState();
+  State<GroupChatPage> createState() => _GroupChatPageState();
 }
 
-class _ChatDetailPageState extends State<ChatDetailPage> {
-  //下拉刷新控制器
-  final EasyRefreshController _controller = EasyRefreshController();
+class _GroupChatPageState extends State<GroupChatPage> {
+  final EasyRefreshController _controller = EasyRefreshController(); //下拉刷新控制器
 
   ScrollController scrollController = ScrollController();
 
-  List<V2TimMessage> c2CMsgList = []; //历史消息
+  List<V2TimMessage> groupMsgList = []; //群聊历史消息
 
-  AudioPlayer audioPlayer = AudioPlayer();
+  AudioPlayer audioPlayer = AudioPlayer(); //语音播放
 
-  var userID;
+  var groupID; //群ID
 
   @override
   void initState() {
     super.initState();
-
-    userID = widget.userID;
-    Provider.of<Chat>(context, listen: false).getC2CMsgList(userID);
-    Provider.of<Chat>(context, listen: false).setConverID(userID);
-    Provider.of<Chat>(context, listen: false).chatPage(ChaPage.crc);
-    Provider.of<Chat>(context, listen: false).clearC2CMsgUnRead(userID);
+    groupID = widget.groupID;
+    Provider.of<Chat>(context, listen: false).getGroupMsgList(groupID);
+    Provider.of<Chat>(context, listen: false).setConverID(groupID);
+    Provider.of<Chat>(context, listen: false).chatPage(ChaPage.group);
+    Provider.of<GroupChat>(context, listen: false).clearGroupMsgUnRead(groupID);
 
     //更新聊天页面
-    eventBus.on<UpdateChatPageEvent>().listen((event) {
+    eventBus.on<UpdateGroupChatPageEvent>().listen((event) {
       if (mounted) {
-        c2CMsgList = event.c2CMsgList;
+        groupMsgList = event.groupMsgList;
         setState(() {});
         _controller.finishLoad(success: true, noMore: false);
       }
@@ -117,16 +101,8 @@ class _ChatDetailPageState extends State<ChatDetailPage> {
                 color: Colors.black,
               ),
               onPressed: () {
-                Application.router.navigateTo(
-                  context,
-                  "/chatSetting",
-                  transition: TransitionType.inFromRight,
-                  routeSettings: RouteSettings(
-                    arguments: {
-                      "userID": widget.userID,
-                    },
-                  ),
-                );
+                Provider.of<GroupChat>(context, listen: false)
+                    .getGroupMemberList(groupID, context);
               }),
         ],
       ),
@@ -161,16 +137,16 @@ class _ChatDetailPageState extends State<ChatDetailPage> {
                                 ExtendedListDelegate(closeToTrailing: true),
                             controller: scrollController,
                             reverse: true,
-                            itemCount: c2CMsgList.length,
+                            itemCount: groupMsgList.length,
                             itemBuilder: (BuildContext context, int index) {
                               //单个消息
-                              return chatItem(c2CMsgList[index], index);
+                              return chatItem(groupMsgList[index], index);
                             },
                           ),
                           onLoad: () async {
                             Future.delayed(const Duration(seconds: 1), () {
                               Provider.of<Chat>(context, listen: false)
-                                  .getC2CHistoryMsgList(userID, c2CMsgList);
+                                  .getC2CHistoryMsgList(groupID, groupMsgList);
                             });
                           },
                         ),
@@ -181,7 +157,7 @@ class _ChatDetailPageState extends State<ChatDetailPage> {
               ),
               SafeArea(
                 child: Container(
-                  child: ButtonInputBox(converID: userID, isGroup: false),
+                  child: ButtonInputBox(converID: groupID, isGroup: true),
                 ),
               )
             ],
@@ -197,10 +173,10 @@ class _ChatDetailPageState extends State<ChatDetailPage> {
 
     var time = RelativeDateFormat.chatTime(item.timestamp!);
     //是否显示时间
-    if (index + 1 == c2CMsgList.length) {
+    if (index + 1 == groupMsgList.length) {
       shouTime = true;
     } else {
-      var m = (item.timestamp! - c2CMsgList[index + 1].timestamp!) / 60;
+      var m = (item.timestamp! - groupMsgList[index + 1].timestamp!) / 60;
       if (m > 5) {
         shouTime = true;
       }
@@ -251,7 +227,7 @@ class _ChatDetailPageState extends State<ChatDetailPage> {
     switch (item.elemType) {
       case MessageElemType.V2TIM_ELEM_TYPE_TEXT:
         // textMsg = "[文本]";
-        return TextMsg(item: item, isGroup: false);
+        return TextMsg(item: item, isGroup: true);
 
       case MessageElemType.V2TIM_ELEM_TYPE_CUSTOM:
         // textMsg = "[自定义消息]";
@@ -259,15 +235,15 @@ class _ChatDetailPageState extends State<ChatDetailPage> {
 
       case MessageElemType.V2TIM_ELEM_TYPE_IMAGE:
         // textMsg = "[图片]";
-        return MsgImage(item: item, isGroup: false);
+        return MsgImage(item: item, isGroup: true);
 
       case MessageElemType.V2TIM_ELEM_TYPE_SOUND:
         // textMsg = "[语音]";
-        return MsgVoice(item: item, audioPlayer: audioPlayer, isGroup: false);
+        return MsgVoice(item: item, audioPlayer: audioPlayer, isGroup: true);
 
       case MessageElemType.V2TIM_ELEM_TYPE_VIDEO:
         // textMsg = "[视频]";
-        return MsgVideo(item: item, isGroup: false);
+        return MsgVideo(item: item, isGroup: true);
 
       case MessageElemType.V2TIM_ELEM_TYPE_FILE:
         // textMsg = "[文件]";
@@ -275,7 +251,7 @@ class _ChatDetailPageState extends State<ChatDetailPage> {
 
       case MessageElemType.V2TIM_ELEM_TYPE_FACE:
         // textMsg = "[表情包]";
-        return MsgEmo(item: item, isGroup: false);
+        return MsgEmo(item: item, isGroup: true);
 
       default:
         return Container();

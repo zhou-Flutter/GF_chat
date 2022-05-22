@@ -21,9 +21,11 @@ import 'package:shared_preferences/shared_preferences.dart';
 import 'package:vibration/vibration.dart';
 
 class Voice extends StatefulWidget {
-  String? userID;
+  String converID;
+  bool isGroup;
   Voice({
-    this.userID,
+    required this.converID,
+    required this.isGroup,
     Key? key,
   }) : super(key: key);
 
@@ -152,8 +154,8 @@ class _VoiceState extends State<Voice> {
           } else {
             print("发送语音");
 
-            Provider.of<Chat>(context, listen: false)
-                .sendSoundMsg(sendUrl, duration, widget.userID);
+            Provider.of<Chat>(context, listen: false).sendSoundMsg(
+                sendUrl, duration, widget.converID, widget.isGroup);
           }
           break;
         case SoundState.cancel:

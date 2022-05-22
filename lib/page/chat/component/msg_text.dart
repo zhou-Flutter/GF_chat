@@ -29,8 +29,10 @@ class ItemModel {
 //文本消息
 class TextMsg extends StatefulWidget {
   V2TimMessage? item;
+  bool isGroup;
   TextMsg({
     this.item,
+    required this.isGroup,
     Key? key,
   }) : super(key: key);
 
@@ -114,32 +116,64 @@ class _TextMsgState extends State<TextMsg> {
           SizedBox(
             width: 10.w,
           ),
-          triangle(widget.item!.isSelf),
-          Flexible(
-            child: CustomPopupMenu(
-              child: Container(
-                constraints: BoxConstraints(minHeight: 70.r, minWidth: 70.w),
-                padding: EdgeInsets.all(15.r),
-                decoration: BoxDecoration(
-                  color: widget.item!.isSelf == true
-                      ? HexColor.fromHex('#9370DB')
-                      : Colors.white,
-                  borderRadius: BorderRadius.circular(15.r),
-                ),
-                child: Text(
-                  "$textMsg",
-                  style: TextStyle(
-                    fontSize: 28.sp,
+          Column(
+            crossAxisAlignment: widget.item!.isSelf == true
+                ? CrossAxisAlignment.end
+                : CrossAxisAlignment.start,
+            children: [
+              widget.isGroup == true
+                  ? widget.item!.isSelf == true
+                      ? Container()
+                      : Container(
+                          width: 100.w,
+                          padding: EdgeInsets.only(
+                              left: 15.r, bottom: 10.r, right: 15.r),
+                          child: Text(
+                            widget.item!.nickName!,
+                            overflow: TextOverflow.ellipsis,
+                            style: TextStyle(
+                                color: Colors.black45, fontSize: 24.sp),
+                          ),
+                        )
+                  : Container(),
+              Row(
+                mainAxisSize: MainAxisSize.min,
+                textDirection: widget.item!.isSelf == true
+                    ? TextDirection.rtl
+                    : TextDirection.ltr,
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  triangle(widget.item!.isSelf),
+                  Flexible(
+                    child: CustomPopupMenu(
+                      child: Container(
+                        constraints:
+                            BoxConstraints(minHeight: 70.r, minWidth: 70.w),
+                        padding: EdgeInsets.all(15.r),
+                        decoration: BoxDecoration(
+                          color: widget.item!.isSelf == true
+                              ? HexColor.fromHex('#9370DB')
+                              : Colors.white,
+                          borderRadius: BorderRadius.circular(15.r),
+                        ),
+                        child: Text(
+                          "$textMsg",
+                          style: TextStyle(
+                            fontSize: 28.sp,
+                          ),
+                        ),
+                      ),
+                      menuBuilder: _buildLongPressMenu,
+                      barrierColor: Colors.transparent,
+                      pressType: PressType.longPress,
+                      verticalMargin: 0,
+                      horizontalMargin: 15,
+                      controller: _popupMenucontroller,
+                    ),
                   ),
-                ),
-              ),
-              menuBuilder: _buildLongPressMenu,
-              barrierColor: Colors.transparent,
-              pressType: PressType.longPress,
-              verticalMargin: 0,
-              horizontalMargin: 15,
-              controller: _popupMenucontroller,
-            ),
+                ],
+              )
+            ],
           ),
           Container(
             alignment: Alignment.center,

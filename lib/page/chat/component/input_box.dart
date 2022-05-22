@@ -19,11 +19,13 @@ import 'package:text_span_field/text_span_field.dart';
 late StreamSubscription<bool> keyboardSubscription;
 
 class ButtonInputBox extends StatefulWidget {
-  var userID;
+  String converID; //对话ID  可以是群聊ID  个可以单聊对话ID
+  bool isGroup;
   var animatedListKey;
   ButtonInputBox({
-    this.userID,
+    required this.converID,
     this.animatedListKey,
+    required this.isGroup,
     Key? key,
   }) : super(key: key);
 
@@ -290,8 +292,8 @@ class _ButtonInputBoxState extends State<ButtonInputBox>
                         //   }
                         // }
 
-                        Provider.of<Chat>(context, listen: false)
-                            .sendTextMsg(inputContent, widget.userID, false);
+                        Provider.of<Chat>(context, listen: false).createTextMsg(
+                            inputContent, widget.converID, widget.isGroup);
                         textEditingController.clear();
 
                         setState(() {});
@@ -366,7 +368,8 @@ class _ButtonInputBoxState extends State<ButtonInputBox>
             maintainState: true,
             child: EmoTicon(
               textSpanBuilder: textSpanBuilder,
-              userID: widget.userID,
+              converID: widget.converID,
+              isGroup: widget.isGroup,
             ),
           ),
         ),
@@ -375,7 +378,8 @@ class _ButtonInputBoxState extends State<ButtonInputBox>
             visible: btnMeuType == BtnMeuType.file ? true : false,
             maintainState: true,
             child: FileMenu(
-              userID: widget.userID,
+              converID: widget.converID,
+              isGroup: widget.isGroup,
             ),
           ),
         ),
@@ -384,7 +388,8 @@ class _ButtonInputBoxState extends State<ButtonInputBox>
             visible: btnMeuType == BtnMeuType.voice ? true : false,
             maintainState: false,
             child: Voice(
-              userID: widget.userID,
+              converID: widget.converID,
+              isGroup: widget.isGroup,
             ),
           ),
         )

@@ -6,7 +6,7 @@ class Friends {
   bool? isSelect;
   Friends({
     required this.friendInfo,
-    required this.indexLetter,
+    this.indexLetter = "#",
     this.isSelect = false,
   });
 }

@@ -72,7 +72,8 @@ class _ContactsState extends State<Contacts> {
         );
         break;
       case 2:
-        print("开发中");
+        Provider.of<Chat>(context, listen: false).getJoinedGroupList(context);
+
         break;
       case 3:
         Application.router.navigateTo(

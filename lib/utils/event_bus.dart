@@ -39,6 +39,12 @@ class UpdateChatPageEvent {
   UpdateChatPageEvent(this.c2CMsgList, this.isAm);
 }
 
+//刷新 群聊 聊天页面
+class UpdateGroupChatPageEvent {
+  List<V2TimMessage> groupMsgList;
+  UpdateGroupChatPageEvent(this.groupMsgList);
+}
+
 //聊天页面可展示的高度
 class ChatPageHightEvent {
   double hight;

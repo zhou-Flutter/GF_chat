@@ -77,6 +77,7 @@ class _FriendListChoiceState extends State<FriendListChoice> {
       }
       return a.indexLetter.compareTo(b.indexLetter);
     });
+    // friends.addAll(friends);
   }
 
   @override
@@ -84,7 +85,6 @@ class _FriendListChoiceState extends State<FriendListChoice> {
     return ScrollConfiguration(
       behavior: CusBehavior(),
       child: ListView.builder(
-        shrinkWrap: true,
         physics: AlwaysScrollableScrollPhysics(),
         itemCount: friends.length,
         itemBuilder: (context, index) {
@@ -122,10 +122,7 @@ class _FriendListChoiceState extends State<FriendListChoice> {
             : Container(),
         CustomTap(
           tapColor: HexColor.fromHex('#f5f5f5'),
-          onTap: () {
-            Provider.of<Chat>(context, listen: false)
-                .getFriendsInfo(item.friendInfo.userProfile!.userID, context);
-          },
+          onTap: () {},
           child: Row(
             crossAxisAlignment: CrossAxisAlignment.center,
             children: [
@@ -162,7 +159,7 @@ class _FriendListChoiceState extends State<FriendListChoice> {
     return Checkbox(
       value: item.isSelect,
       activeColor: Colors.green,
-      // shape: CircleBorder(),
+      shape: CircleBorder(),
       onChanged: (value) {
         if (value!) {
           print("选择");

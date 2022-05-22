@@ -413,16 +413,30 @@ class _HomeState extends State<Home> {
 
   //页面跳转
   onTap(V2TimConversation item) {
-    Application.router.navigateTo(
-      context,
-      "/chatDetail",
-      transition: TransitionType.inFromRight,
-      routeSettings: RouteSettings(
-        arguments: {
-          "userID": item.userID,
-          "showName": item.showName,
-        },
-      ),
-    );
+    if (item.type == 1) {
+      Application.router.navigateTo(
+        context,
+        "/chatDetail",
+        transition: TransitionType.inFromRight,
+        routeSettings: RouteSettings(
+          arguments: {
+            "userID": item.userID,
+            "showName": item.showName,
+          },
+        ),
+      );
+    } else {
+      Application.router.navigateTo(
+        context,
+        "/groupChatPage",
+        transition: TransitionType.inFromRight,
+        routeSettings: RouteSettings(
+          arguments: {
+            "groupID": item.groupID,
+            "showName": item.showName,
+          },
+        ),
+      );
+    }
   }
 }

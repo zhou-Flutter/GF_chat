@@ -16,10 +16,12 @@ import 'package:tencent_im_sdk_plugin/models/v2_tim_message.dart';
 
 class MsgVoice extends StatefulWidget {
   V2TimMessage? item;
+  bool isGroup;
   AudioPlayer? audioPlayer;
   MsgVoice({
     this.item,
     this.audioPlayer,
+    required this.isGroup,
     Key? key,
   }) : super(key: key);
 
@@ -152,58 +154,91 @@ class _MsgVoiceState extends State<MsgVoice> {
           SizedBox(
             width: 10.w,
           ),
-          triangle(widget.item!.isSelf),
-          Flexible(
-            child: InkWell(
-              onTap: () {
-                //未读语音
-                if (ishowUnreadReddot == true) {
-                  ishowUnreadReddot = false;
-                  Provider.of<Chat>(context, listen: false)
-                      .setLocalCustomInt(widget.item!.msgID, 1);
-                }
-                play();
-              },
-              child: Container(
-                constraints: BoxConstraints(minHeight: 70.r, minWidth: 70.w),
-                padding: EdgeInsets.only(top: 10.r, right: 10.r, bottom: 10.r),
-                decoration: BoxDecoration(
-                  color: widget.item!.isSelf == true
-                      ? HexColor.fromHex('#9370DB')
-                      : Colors.white,
-                  borderRadius: BorderRadius.circular(15.r),
-                ),
-                child: Container(
-                  width: 140.r,
-                  child: Row(
-                    textDirection: widget.item!.isSelf == true
-                        ? TextDirection.rtl
-                        : TextDirection.ltr,
-                    children: [
-                      Container(
-                        height: 50.r,
-                        width: 50.r,
-                        child: Directionality(
-                          textDirection: widget.item!.isSelf == true
-                              ? TextDirection.rtl
-                              : TextDirection.ltr,
-                          child: playAnimation(),
+          Column(
+            crossAxisAlignment: widget.item!.isSelf == true
+                ? CrossAxisAlignment.end
+                : CrossAxisAlignment.start,
+            children: [
+              widget.isGroup == true
+                  ? widget.item!.isSelf == true
+                      ? Container()
+                      : Container(
+                          width: 100.w,
+                          padding: EdgeInsets.only(
+                              left: 15.r, bottom: 10.r, right: 15.r),
+                          child: Text(
+                            widget.item!.nickName!,
+                            overflow: TextOverflow.ellipsis,
+                            style: TextStyle(
+                                color: Colors.black45, fontSize: 24.sp),
+                          ),
+                        )
+                  : Container(),
+              Row(
+                mainAxisSize: MainAxisSize.min,
+                textDirection: widget.item!.isSelf == true
+                    ? TextDirection.rtl
+                    : TextDirection.ltr,
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  triangle(widget.item!.isSelf),
+                  Flexible(
+                    child: InkWell(
+                      onTap: () {
+                        //未读语音
+                        if (ishowUnreadReddot == true) {
+                          ishowUnreadReddot = false;
+                          Provider.of<Chat>(context, listen: false)
+                              .setLocalCustomInt(widget.item!.msgID, 1);
+                        }
+                        play();
+                      },
+                      child: Container(
+                        constraints:
+                            BoxConstraints(minHeight: 70.r, minWidth: 70.w),
+                        padding: EdgeInsets.only(
+                            top: 10.r, right: 10.r, bottom: 10.r),
+                        decoration: BoxDecoration(
+                          color: widget.item!.isSelf == true
+                              ? HexColor.fromHex('#9370DB')
+                              : Colors.white,
+                          borderRadius: BorderRadius.circular(15.r),
+                        ),
+                        child: Container(
+                          width: 140.r,
+                          child: Row(
+                            textDirection: widget.item!.isSelf == true
+                                ? TextDirection.rtl
+                                : TextDirection.ltr,
+                            children: [
+                              Container(
+                                height: 50.r,
+                                width: 50.r,
+                                child: Directionality(
+                                  textDirection: widget.item!.isSelf == true
+                                      ? TextDirection.rtl
+                                      : TextDirection.ltr,
+                                  child: playAnimation(),
+                                ),
+                              ),
+                              SizedBox(width: 15.w),
+                              Text(
+                                "$time\"",
+                                style: TextStyle(
+                                  fontSize: 30.sp,
+                                ),
+                              ),
+                            ],
+                          ),
                         ),
                       ),
-                      SizedBox(width: 15.w),
-                      Text(
-                        "$time\"",
-                        style: TextStyle(
-                          fontSize: 30.sp,
-                        ),
-                      ),
-                    ],
+                    ),
                   ),
-                ),
-              ),
-            ),
+                  unreadRedDot(),
+                ],
+              )
+            ],
           ),
-          unreadRedDot(),
           SizedBox(
             width: 20.h,
           ),

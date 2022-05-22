@@ -11,6 +11,8 @@ import 'package:tencent_im_sdk_plugin/enum/friend_application_type_enum.dart';
 import 'package:tencent_im_sdk_plugin/enum/friend_response_type_enum.dart';
 import 'package:tencent_im_sdk_plugin/enum/friend_type.dart';
 import 'package:tencent_im_sdk_plugin/enum/friend_type_enum.dart';
+import 'package:tencent_im_sdk_plugin/enum/group_add_opt_enum.dart';
+import 'package:tencent_im_sdk_plugin/enum/group_member_role_enum.dart';
 import 'package:tencent_im_sdk_plugin/enum/user_info_allow_type.dart';
 import 'package:tencent_im_sdk_plugin/models/v2_tim_callback.dart';
 import 'package:tencent_im_sdk_plugin/models/v2_tim_conversation.dart';
@@ -20,6 +22,9 @@ import 'package:tencent_im_sdk_plugin/models/v2_tim_friend_application_result.da
 import 'package:tencent_im_sdk_plugin/models/v2_tim_friend_info.dart';
 import 'package:tencent_im_sdk_plugin/models/v2_tim_friend_info_result.dart';
 import 'package:tencent_im_sdk_plugin/models/v2_tim_friend_operation_result.dart';
+import 'package:tencent_im_sdk_plugin/models/v2_tim_friend_search_param.dart';
+import 'package:tencent_im_sdk_plugin/models/v2_tim_group_info.dart';
+import 'package:tencent_im_sdk_plugin/models/v2_tim_group_member.dart';
 import 'package:tencent_im_sdk_plugin/models/v2_tim_message.dart';
 import 'package:tencent_im_sdk_plugin/models/v2_tim_msg_create_info_result.dart';
 import 'package:tencent_im_sdk_plugin/models/v2_tim_user_full_info.dart';
@@ -28,8 +33,8 @@ import 'package:tencent_im_sdk_plugin/tencent_im_sdk_plugin.dart';
 
 class Chat with ChangeNotifier {
   //
-  var pageUserId;
-  bool ischatPage = false;
+  var converId;
+  ChaPage isChaPage = ChaPage.noPage; //群聊界面 单聊界面 无
   List<V2TimMessage> _c2CMsgList = []; //消息
   List<V2TimConversation> _currentMessageList = []; //会话列表
   int _unreadCount = 0; //未读总数
@@ -41,6 +46,9 @@ class Chat with ChangeNotifier {
   int _friendApplicationUnreadCount = 0; //申请好友未读数
   List<V2TimFriendApplication?>? _applicationList = []; //申请列表
   V2TimConversation? _v2timConversation; //单个会话信息
+  List<V2TimFriendInfoResult>? _searchFriend = []; //搜索好友列表
+  List<V2TimGroupInfo> _joinedGroupList = []; //加入群组的
+  List<V2TimMessage> _groupMsgList = []; //群聊消息
 
   List<V2TimMessage> get c2CMsgList => _c2CMsgList;
   List<V2TimConversation> get currentMessageList => _currentMessageList;
@@ -53,15 +61,18 @@ class Chat with ChangeNotifier {
   int get friendApplicationUnreadCount => _friendApplicationUnreadCount;
   List<V2TimFriendApplication?>? get applicationList => _applicationList;
   V2TimConversation? get v2timConversation => _v2timConversation;
+  List<V2TimFriendInfoResult>? get searchFriend => _searchFriend;
+  List<V2TimGroupInfo> get joinedGroupList => _joinedGroupList;
+  List<V2TimMessage> get groupMsgList => _groupMsgList;
 
-  //聊天界面的用户 和谁在聊天
-  setUserId(userID) {
-    pageUserId = userID;
+  //聊天界面的用户 和谁在聊天 converID 时单聊 userId 也是 群聊ID
+  setConverID(converID) {
+    converId = converID;
   }
 
   //是否在聊天界面
-  chatPage(bool e) {
-    ischatPage = e;
+  chatPage(ChaPage chaPage) {
+    isChaPage = chaPage;
   }
 
   //获取会话列表
@@ -122,13 +133,22 @@ class Chat with ChangeNotifier {
   recvNewMessage(V2TimMessage newMessage) {
     // AudioCache player = AudioCache();
     // player.play('mp3/13203.wav');
-    if (ischatPage) {
-      if (newMessage.userID == pageUserId) {
+    if (isChaPage == ChaPage.crc) {
+      if (newMessage.userID == converId) {
         //消息去重
         if (newMessage.msgID != _c2CMsgList[0].msgID) {
           _c2CMsgList.insert(0, newMessage);
           eventBus.fire(UpdateChatPageEvent(_c2CMsgList, false));
-          clearC2CMsgUnRead(pageUserId);
+          clearC2CMsgUnRead(converId);
+        }
+      }
+    } else {
+      if (newMessage.groupID == converId) {
+        //消息去重
+        if (newMessage.msgID != _groupMsgList[0].msgID) {
+          _groupMsgList.insert(0, newMessage);
+          eventBus.fire(UpdateGroupChatPageEvent(_groupMsgList));
+          clearGroupMsgUnRead(converId);
         }
       }
     }
@@ -145,12 +165,130 @@ class Chat with ChangeNotifier {
     }
   }
 
-  //发送 文本 消息
-  sendTextMsg(String msgtext, userID, isAm) async {
+  // 清空群聊未读消息数
+  clearGroupMsgUnRead(groupID) async {
+    V2TimCallback res = await TencentImSDKPlugin.v2TIMManager
+        .getMessageManager()
+        .markGroupMessageAsRead(groupID: groupID);
+    if (res.code == 0) {
+      getConversationList();
+    }
+  }
+
+  //创建 文本 消息
+  createTextMsg(String msgtext, String converID, bool isGroup) async {
     V2TimValueCallback<V2TimMsgCreateInfoResult> createMessage =
         await TencentImSDKPlugin.v2TIMManager
             .getMessageManager()
             .createTextMessage(text: msgtext);
+    String id = createMessage.data!.id!; // 返回的消息创建id
+
+    if (isGroup) {
+      _groupMsgList.insert(0, createMessage.data!.messageInfo!);
+      eventBus.fire(UpdateGroupChatPageEvent(_groupMsgList));
+      sendGroupMessage(id, converID);
+    } else {
+      _c2CMsgList.insert(0, createMessage.data!.messageInfo!);
+      eventBus.fire(UpdateChatPageEvent(_c2CMsgList, false));
+      sendMessage(id, converID);
+    }
+  }
+
+  //创建 表情 消息
+  createFaceMsg(int index, String msg, String converID, bool isGroup) async {
+    V2TimValueCallback<V2TimMsgCreateInfoResult> createMessage =
+        await TencentImSDKPlugin.v2TIMManager
+            .getMessageManager()
+            .createFaceMessage(index: index, data: msg);
+    String id = createMessage.data!.id!; // 返回的消息创建id
+
+    if (isGroup) {
+      _groupMsgList.insert(0, createMessage.data!.messageInfo!);
+      eventBus.fire(UpdateGroupChatPageEvent(_groupMsgList));
+      sendGroupMessage(id, converID);
+    } else {
+      _c2CMsgList.insert(0, createMessage.data!.messageInfo!);
+      eventBus.fire(UpdateChatPageEvent(_c2CMsgList, false));
+      sendMessage(id, converID);
+    }
+  }
+
+  //发送 图片 消息
+  sendImageMsg(String imagePath, String converID, bool isGroup) async {
+    V2TimValueCallback<V2TimMsgCreateInfoResult> createMessage =
+        await TencentImSDKPlugin.v2TIMManager
+            .getMessageManager()
+            .createImageMessage(imagePath: imagePath);
+    String id = createMessage.data!.id!; // 返回的消息创建id
+
+    if (isGroup) {
+      _groupMsgList.insert(0, createMessage.data!.messageInfo!);
+      eventBus.fire(UpdateGroupChatPageEvent(_groupMsgList));
+      sendGroupMessage(id, converID);
+    } else {
+      _c2CMsgList.insert(0, createMessage.data!.messageInfo!);
+      eventBus.fire(UpdateChatPageEvent(_c2CMsgList, false));
+      sendMessage(id, converID);
+    }
+  }
+
+  //发送 视频 消息
+  sendVideoMsg(String videoFilePath, String type, int duration,
+      String snapshotPath, String converID, bool isGroup) async {
+    V2TimValueCallback<V2TimMsgCreateInfoResult> createMessage =
+        await TencentImSDKPlugin.v2TIMManager
+            .getMessageManager()
+            .createVideoMessage(
+              videoFilePath: videoFilePath,
+              type: type,
+              duration: duration,
+              snapshotPath: snapshotPath,
+            );
+    String id = createMessage.data!.id!; // 返回的消息创建id
+
+    if (isGroup) {
+      _groupMsgList.insert(0, createMessage.data!.messageInfo!);
+      eventBus.fire(UpdateGroupChatPageEvent(_groupMsgList));
+      sendGroupMessage(id, converID);
+    } else {
+      _c2CMsgList.insert(0, createMessage.data!.messageInfo!);
+      eventBus.fire(UpdateChatPageEvent(_c2CMsgList, false));
+      sendMessage(id, converID);
+    }
+  }
+
+  //发送 语言 消息
+  sendSoundMsg(
+      String soundPath, int duration, String converID, bool isGroup) async {
+    V2TimValueCallback<V2TimMsgCreateInfoResult> createMessage =
+        await TencentImSDKPlugin.v2TIMManager
+            .getMessageManager()
+            .createSoundMessage(soundPath: soundPath, duration: duration);
+    String id = createMessage.data!.id!; // 返回的消息创建id
+
+    if (isGroup) {
+      _groupMsgList.insert(0, createMessage.data!.messageInfo!);
+      eventBus.fire(UpdateGroupChatPageEvent(_groupMsgList));
+      sendGroupMessage(id, converID);
+    } else {
+      _c2CMsgList.insert(0, createMessage.data!.messageInfo!);
+      eventBus.fire(UpdateChatPageEvent(_c2CMsgList, false));
+      sendMessage(id, converID);
+    }
+  }
+
+  /* 
+    ## 自定义消息
+    ## PROMPT- (不更新会话的提示类 自定义信息)
+    ## CONCISE- (不更新会话的自我介绍 自定义信息)
+    ## VOICECALL- (不更新未读数的语音通话 自定义信息)
+
+  */
+  sendCustomMsg(String msgtext, userID, isAm, isExcludedFromLastMessage) async {
+    V2TimValueCallback<V2TimMsgCreateInfoResult> createMessage =
+        await TencentImSDKPlugin.v2TIMManager
+            .getMessageManager()
+            .createCustomMessage(data: msgtext);
     String id = createMessage.data!.id!; // 返回的消息创建id
 
     _c2CMsgList.insert(0, createMessage.data!.messageInfo!);
@@ -161,6 +299,8 @@ class Chat with ChangeNotifier {
               id: id, // 将消息创建id传递给
               receiver: userID,
               groupID: "",
+              isExcludedFromUnreadCount: true,
+              isExcludedFromLastMessage: isExcludedFromLastMessage,
             );
 
     if (res.data != null) {
@@ -173,24 +313,14 @@ class Chat with ChangeNotifier {
     }
   }
 
-  //发送 表情 消息
-  sendFaceMsg(int index, String msg, userID) async {
-    V2TimValueCallback<V2TimMsgCreateInfoResult> createMessage =
-        await TencentImSDKPlugin.v2TIMManager
-            .getMessageManager()
-            .createFaceMessage(index: index, data: msg);
-    String id = createMessage.data!.id!; // 返回的消息创建id
-
-    _c2CMsgList.insert(0, createMessage.data!.messageInfo!);
-    eventBus.fire(UpdateChatPageEvent(_c2CMsgList, false));
-
+  //发送 单聊 消息
+  sendMessage(id, userID) async {
     V2TimValueCallback<V2TimMessage> res =
         await TencentImSDKPlugin.v2TIMManager.getMessageManager().sendMessage(
               id: id, // 将消息创建id传递给
               receiver: userID,
               groupID: "",
             );
-
     if (res.data != null) {
       for (int i = 0; i < _c2CMsgList.length; i++) {
         if (_c2CMsgList[i].id == res.data!.id) {
@@ -201,91 +331,19 @@ class Chat with ChangeNotifier {
     }
   }
 
-  //发送 图片 消息
-  sendImageMsg(String imagePath, userID) async {
-    V2TimValueCallback<V2TimMsgCreateInfoResult> createMessage =
-        await TencentImSDKPlugin.v2TIMManager
-            .getMessageManager()
-            .createImageMessage(imagePath: imagePath);
-    String id = createMessage.data!.id!; // 返回的消息创建id
-
-    _c2CMsgList.insert(0, createMessage.data!.messageInfo!);
-    eventBus.fire(UpdateChatPageEvent(_c2CMsgList, false));
-
+  //发送 群聊 消息
+  sendGroupMessage(id, groupID) async {
     V2TimValueCallback<V2TimMessage> res =
         await TencentImSDKPlugin.v2TIMManager.getMessageManager().sendMessage(
               id: id, // 将消息创建id传递给
-              receiver: userID,
-              groupID: "",
+              receiver: "",
+              groupID: groupID,
             );
-
     if (res.data != null) {
-      for (int i = 0; i < _c2CMsgList.length; i++) {
-        if (_c2CMsgList[i].id == res.data!.id) {
-          _c2CMsgList[i] = res.data!;
-          eventBus.fire(UpdateChatPageEvent(_c2CMsgList, false));
-        }
-      }
-    }
-  }
-
-  //发送 视频 消息
-  sendVideoMsg(String videoFilePath, String type, int duration,
-      String snapshotPath, userID) async {
-    V2TimValueCallback<V2TimMsgCreateInfoResult> createMessage =
-        await TencentImSDKPlugin.v2TIMManager
-            .getMessageManager()
-            .createVideoMessage(
-              videoFilePath: videoFilePath,
-              type: type,
-              duration: duration,
-              snapshotPath: snapshotPath,
-            );
-    String id = createMessage.data!.id!; // 返回的消息创建id
-
-    _c2CMsgList.insert(0, createMessage.data!.messageInfo!);
-    eventBus.fire(UpdateChatPageEvent(_c2CMsgList, false));
-
-    V2TimValueCallback<V2TimMessage> res =
-        await TencentImSDKPlugin.v2TIMManager.getMessageManager().sendMessage(
-              id: id, // 将消息创建id传递给
-              receiver: userID,
-              groupID: "",
-            );
-
-    if (res.data != null) {
-      for (int i = 0; i < _c2CMsgList.length; i++) {
-        if (_c2CMsgList[i].id == res.data!.id) {
-          _c2CMsgList[i] = res.data!;
-          eventBus.fire(UpdateChatPageEvent(_c2CMsgList, false));
-        }
-      }
-    }
-  }
-
-  //发送 语言 消息
-  sendSoundMsg(String soundPath, int duration, userID) async {
-    V2TimValueCallback<V2TimMsgCreateInfoResult> createMessage =
-        await TencentImSDKPlugin.v2TIMManager
-            .getMessageManager()
-            .createSoundMessage(soundPath: soundPath, duration: duration);
-    String id = createMessage.data!.id!; // 返回的消息创建id
-
-    _c2CMsgList.insert(0, createMessage.data!.messageInfo!);
-    eventBus.fire(UpdateChatPageEvent(_c2CMsgList, false));
-
-    V2TimValueCallback<V2TimMessage> res =
-        await TencentImSDKPlugin.v2TIMManager.getMessageManager().sendMessage(
-              id: id, // 将消息创建id传递给
-              receiver: userID,
-              groupID: "",
-            );
-
-    if (res.data != null) {
-      for (int i = 0; i < _c2CMsgList.length; i++) {
-        if (_c2CMsgList[i].id == res.data!.id) {
-          _c2CMsgList[i] = res.data!;
-          eventBus.fire(UpdateChatPageEvent(_c2CMsgList, false));
+      for (int i = 0; i < _groupMsgList.length; i++) {
+        if (_groupMsgList[i].id == res.data!.id) {
+          _groupMsgList[i] = res.data!;
+          eventBus.fire(UpdateGroupChatPageEvent(_groupMsgList));
         }
       }
     }
@@ -316,6 +374,21 @@ class Chat with ChangeNotifier {
         );
     _c2CMsgList = res.data!;
     eventBus.fire(UpdateChatPageEvent(_c2CMsgList, false));
+  }
+
+  //获取群聊 最新的20条
+  getGroupMsgList(groupID) async {
+    _groupMsgList = [];
+    V2TimValueCallback<List<V2TimMessage>> res = await TencentImSDKPlugin
+        .v2TIMManager
+        .getMessageManager()
+        .getGroupHistoryMessageList(groupID: groupID, count: 20);
+    if (res.code == 0) {
+      _groupMsgList = res.data!;
+      eventBus.fire(UpdateGroupChatPageEvent(_groupMsgList));
+    } else {
+      ErrorTips.errorMsg(res.code);
+    }
   }
 
   //获取单聊历史消息
@@ -367,42 +440,6 @@ class Chat with ChangeNotifier {
         _c2CMsgList[i].status = 6;
         eventBus.fire(UpdateChatPageEvent(_c2CMsgList, false));
         break;
-      }
-    }
-  }
-
-  /* 
-    ## 自定义消息
-    ## PROMPT- (不更新会话的提示类 自定义信息)
-    ## CONCISE- (不更新会话的自我介绍 自定义信息)
-    ## VOICECALL- (不更新未读数的语音通话 自定义信息)
-
-  */
-  sendCustomMsg(String msgtext, userID, isAm, isExcludedFromLastMessage) async {
-    V2TimValueCallback<V2TimMsgCreateInfoResult> createMessage =
-        await TencentImSDKPlugin.v2TIMManager
-            .getMessageManager()
-            .createCustomMessage(data: msgtext);
-    String id = createMessage.data!.id!; // 返回的消息创建id
-
-    _c2CMsgList.insert(0, createMessage.data!.messageInfo!);
-    eventBus.fire(UpdateChatPageEvent(_c2CMsgList, isAm));
-
-    V2TimValueCallback<V2TimMessage> res =
-        await TencentImSDKPlugin.v2TIMManager.getMessageManager().sendMessage(
-              id: id, // 将消息创建id传递给
-              receiver: userID,
-              groupID: "",
-              isExcludedFromUnreadCount: true,
-              isExcludedFromLastMessage: isExcludedFromLastMessage,
-            );
-
-    if (res.data != null) {
-      for (int i = 0; i < _c2CMsgList.length; i++) {
-        if (_c2CMsgList[i].id == res.data!.id) {
-          _c2CMsgList[i] = res.data!;
-          eventBus.fire(UpdateChatPageEvent(_c2CMsgList, isAm));
-        }
       }
     }
   }
@@ -580,7 +617,7 @@ class Chat with ChangeNotifier {
             );
     if (res.data!.resultCode == 0) {
       Fluttertoast.showToast(msg: "添加成功");
-      sendTextMsg("我通过了你的请求", userID, false);
+      createTextMsg("我通过了你的请求", userID, false);
       //发送不更新会话的消息
       sendCustomMsg("PROMPT-你们已经是好友了", userID, false, true);
       Application.router.navigateTo(
@@ -617,4 +654,87 @@ class Chat with ChangeNotifier {
         .getFriendshipManager()
         .setFriendInfo(userID: userID, friendRemark: friendRemark);
   }
+
+  //搜索好友
+  searchFriends(V2TimFriendSearchParam searchParam) async {
+    V2TimValueCallback<List<V2TimFriendInfoResult>> res =
+        await TencentImSDKPlugin.v2TIMManager
+            .getFriendshipManager()
+            .searchFriends(searchParam: searchParam);
+    if (res.code == 0) {
+      _searchFriend = res.data;
+      notifyListeners();
+    } else {
+      ErrorTips.errorMsg(res.code);
+    }
+  }
+
+  //创建群聊
+  createGroup(List<V2TimFriendInfo> memberList, context) async {
+    List<V2TimGroupMember> list = [];
+    for (V2TimFriendInfo item in memberList) {
+      list.add(V2TimGroupMember(
+          userID: item.userID,
+          role: GroupMemberRoleTypeEnum.V2TIM_GROUP_MEMBER_ROLE_MEMBER));
+    }
+    V2TimValueCallback<String> res =
+        await TencentImSDKPlugin.v2TIMManager.getGroupManager().createGroup(
+              groupType: "Work", // 工作群
+              groupName: "groupName",
+              notification: "工作群", // 群通告
+              introduction: "工作群", // 群介绍
+              isAllMuted: false, // 是否全员禁言
+              faceUrl: "...",
+              addOpt: GroupAddOptTypeEnum.V2TIM_GROUP_ADD_ANY, // 加群权限
+              memberList: list, // 创建时加入的成员
+            );
+
+    if (res.code == 0) {
+      Fluttertoast.showToast(msg: "创建成功");
+      print("创建成功");
+      V2TimValueCallback<V2TimMsgCreateInfoResult> createMessage =
+          await TencentImSDKPlugin.v2TIMManager
+              .getMessageManager()
+              .createTextMessage(text: "加入群聊成功");
+      String id = createMessage.data!.id!; // 返回的消息创建id
+
+      _c2CMsgList.insert(0, createMessage.data!.messageInfo!);
+
+      eventBus.fire(UpdateChatPageEvent(_c2CMsgList, false));
+      sendGroupMessage(id, res.data);
+
+      Application.router.navigateTo(
+        context,
+        "/bottomNav",
+        clearStack: true,
+        transition: TransitionType.inFromRight,
+      );
+    } else {
+      Fluttertoast.showToast(msg: "创建失败");
+    }
+  }
+
+  //获取加入的群聊
+  getJoinedGroupList(context) async {
+    V2TimValueCallback<List<V2TimGroupInfo>> res = await TencentImSDKPlugin
+        .v2TIMManager
+        .getGroupManager()
+        .getJoinedGroupList();
+    if (res.code == 0) {
+      _joinedGroupList = res.data!;
+      Application.router.navigateTo(
+        context,
+        "/groupList",
+        transition: TransitionType.inFromRight,
+      );
+    } else {
+      print('获取失败');
+    }
+  }
+}
+
+enum ChaPage {
+  noPage,
+  crc,
+  group,
 }

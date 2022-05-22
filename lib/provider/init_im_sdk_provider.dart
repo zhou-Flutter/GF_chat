@@ -160,6 +160,14 @@ class InitIMSDKProvider with ChangeNotifier {
             },
           ),
         );
+    //群聊监听
+    await timManager.setGroupListener(
+      listener: V2TimGroupListener(
+        onMemberLeave: (groupID, member) {
+          print("有成员离开群聊");
+        },
+      ),
+    );
   }
 
   //登录

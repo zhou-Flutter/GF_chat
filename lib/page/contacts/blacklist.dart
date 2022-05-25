@@ -31,10 +31,20 @@ class _BlackListState extends State<BlackList> {
         title: Text("黑名单"),
       ),
       body: SingleChildScrollView(
-        child: blackList.length == 0
+        child: blackList.isEmpty
             ? Container(
-                padding: EdgeInsets.all(100.r),
-                child: Text("暂无黑名单"),
+                width: MediaQuery.of(context).size.width,
+                height: 200.h,
+                color: Colors.white,
+                child: Center(
+                  child: Text(
+                    "暂无黑名单",
+                    style: TextStyle(
+                      fontSize: 32.sp,
+                      color: Colors.black45,
+                    ),
+                  ),
+                ),
               )
             : Column(
                 children: blackList.map((e) {

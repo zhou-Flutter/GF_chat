@@ -23,6 +23,7 @@ class ChatSetting extends StatefulWidget {
 
 class _ChatSettingState extends State<ChatSetting> {
   V2TimConversation? conversation;
+  var flag;
   @override
   void initState() {
     super.initState();
@@ -116,6 +117,28 @@ class _ChatSettingState extends State<ChatSetting> {
                     ),
                   ),
                   Container(height: 25.h),
+                  Container(
+                    padding:
+                        EdgeInsets.symmetric(horizontal: 30.r, vertical: 10.r),
+                    color: Colors.white,
+                    child: Row(
+                      children: [
+                        Text(
+                          "屏蔽此人",
+                          style: TextStyle(fontSize: 30.sp),
+                        ),
+                        const Spacer(),
+                        Switch(
+                          value: flag,
+                          onChanged: (value) {
+                            setState(() {
+                              flag = value;
+                            });
+                          },
+                        ),
+                      ],
+                    ),
+                  ),
                   CustomTap(
                     onTap: () {},
                     tapColor: HexColor.fromHex('#f5f5f5'),

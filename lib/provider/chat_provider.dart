@@ -12,6 +12,7 @@ import 'package:tencent_im_sdk_plugin/enum/friend_response_type_enum.dart';
 import 'package:tencent_im_sdk_plugin/enum/friend_type.dart';
 import 'package:tencent_im_sdk_plugin/enum/friend_type_enum.dart';
 import 'package:tencent_im_sdk_plugin/enum/group_add_opt_enum.dart';
+import 'package:tencent_im_sdk_plugin/enum/group_member_filter_enum.dart';
 import 'package:tencent_im_sdk_plugin/enum/group_member_role_enum.dart';
 import 'package:tencent_im_sdk_plugin/enum/user_info_allow_type.dart';
 import 'package:tencent_im_sdk_plugin/models/v2_tim_callback.dart';
@@ -25,6 +26,8 @@ import 'package:tencent_im_sdk_plugin/models/v2_tim_friend_operation_result.dart
 import 'package:tencent_im_sdk_plugin/models/v2_tim_friend_search_param.dart';
 import 'package:tencent_im_sdk_plugin/models/v2_tim_group_info.dart';
 import 'package:tencent_im_sdk_plugin/models/v2_tim_group_member.dart';
+import 'package:tencent_im_sdk_plugin/models/v2_tim_group_member_full_info.dart';
+import 'package:tencent_im_sdk_plugin/models/v2_tim_group_member_info_result.dart';
 import 'package:tencent_im_sdk_plugin/models/v2_tim_message.dart';
 import 'package:tencent_im_sdk_plugin/models/v2_tim_msg_create_info_result.dart';
 import 'package:tencent_im_sdk_plugin/models/v2_tim_user_full_info.dart';
@@ -85,6 +88,7 @@ class Chat with ChangeNotifier {
     if (data.data!.conversationList!.isNotEmpty) {
       _currentMessageList =
           data.data!.conversationList!.cast<V2TimConversation>();
+      notifyListeners();
     } else {
       _currentMessageList = [];
     }
@@ -117,16 +121,24 @@ class Chat with ChangeNotifier {
     getConversationList();
   }
 
-  //获取指定 会话的信息
+  ///获取 指定 会话的信息 "c2c_$conversationID"
   getConversation(conversationID) async {
     V2TimValueCallback<V2TimConversation> res = await TencentImSDKPlugin
         .v2TIMManager
         .getConversationManager()
-        .getConversation(conversationID: "c2c_$conversationID");
+        .getConversation(conversationID: conversationID);
     if (res.data != null) {
       _v2timConversation = res.data;
+      notifyListeners();
     }
-    notifyListeners();
+  }
+
+  //设置草稿箱
+  setConversationDraft(conversationID, draftText) async {
+    await TencentImSDKPlugin.v2TIMManager
+        .getConversationManager()
+        .setConversationDraft(
+            conversationID: conversationID, draftText: draftText);
   }
 
   //接收 消息
@@ -214,7 +226,7 @@ class Chat with ChangeNotifier {
   }
 
   //发送 图片 消息
-  sendImageMsg(String imagePath, String converID, bool isGroup) async {
+  createImageMsg(String imagePath, String converID, bool isGroup) async {
     V2TimValueCallback<V2TimMsgCreateInfoResult> createMessage =
         await TencentImSDKPlugin.v2TIMManager
             .getMessageManager()
@@ -233,7 +245,7 @@ class Chat with ChangeNotifier {
   }
 
   //发送 视频 消息
-  sendVideoMsg(String videoFilePath, String type, int duration,
+  createVideoMsg(String videoFilePath, String type, int duration,
       String snapshotPath, String converID, bool isGroup) async {
     V2TimValueCallback<V2TimMsgCreateInfoResult> createMessage =
         await TencentImSDKPlugin.v2TIMManager
@@ -258,7 +270,7 @@ class Chat with ChangeNotifier {
   }
 
   //发送 语言 消息
-  sendSoundMsg(
+  createSoundMsg(
       String soundPath, int duration, String converID, bool isGroup) async {
     V2TimValueCallback<V2TimMsgCreateInfoResult> createMessage =
         await TencentImSDKPlugin.v2TIMManager
@@ -282,44 +294,59 @@ class Chat with ChangeNotifier {
     ## PROMPT- (不更新会话的提示类 自定义信息)
     ## CONCISE- (不更新会话的自我介绍 自定义信息)
     ## VOICECALL- (不更新未读数的语音通话 自定义信息)
+    ## CGTP- (常见群聊成功 提示类 自定义信息)
 
   */
-  sendCustomMsg(String msgtext, userID, isAm, isExcludedFromLastMessage) async {
+  createCustomMsg(
+    String msgtext,
+    String converID,
+    bool isGroup, {
+    bool isExcludedFromUnreadCount = false,
+    bool isExcludedFromLastMessage = false,
+  }) async {
     V2TimValueCallback<V2TimMsgCreateInfoResult> createMessage =
         await TencentImSDKPlugin.v2TIMManager
             .getMessageManager()
             .createCustomMessage(data: msgtext);
     String id = createMessage.data!.id!; // 返回的消息创建id
 
-    _c2CMsgList.insert(0, createMessage.data!.messageInfo!);
-    eventBus.fire(UpdateChatPageEvent(_c2CMsgList, isAm));
+    if (isGroup) {
+      _groupMsgList.insert(0, createMessage.data!.messageInfo!);
+      eventBus.fire(UpdateGroupChatPageEvent(_groupMsgList));
 
-    V2TimValueCallback<V2TimMessage> res =
-        await TencentImSDKPlugin.v2TIMManager.getMessageManager().sendMessage(
-              id: id, // 将消息创建id传递给
-              receiver: userID,
-              groupID: "",
-              isExcludedFromUnreadCount: true,
-              isExcludedFromLastMessage: isExcludedFromLastMessage,
-            );
+      sendGroupMessage(
+        id,
+        converID,
+        isExcludedFromUnreadCount: isExcludedFromUnreadCount,
+        isExcludedFromLastMessage: isExcludedFromLastMessage,
+      );
+    } else {
+      _c2CMsgList.insert(0, createMessage.data!.messageInfo!);
+      eventBus.fire(UpdateChatPageEvent(_c2CMsgList, false));
 
-    if (res.data != null) {
-      for (int i = 0; i < _c2CMsgList.length; i++) {
-        if (_c2CMsgList[i].id == res.data!.id) {
-          _c2CMsgList[i] = res.data!;
-          eventBus.fire(UpdateChatPageEvent(_c2CMsgList, isAm));
-        }
-      }
+      sendMessage(
+        id,
+        converID,
+        isExcludedFromUnreadCount: isExcludedFromUnreadCount,
+        isExcludedFromLastMessage: isExcludedFromLastMessage,
+      );
     }
   }
 
   //发送 单聊 消息
-  sendMessage(id, userID) async {
+  sendMessage(
+    String id,
+    String userID, {
+    bool isExcludedFromUnreadCount = false,
+    bool isExcludedFromLastMessage = false,
+  }) async {
     V2TimValueCallback<V2TimMessage> res =
         await TencentImSDKPlugin.v2TIMManager.getMessageManager().sendMessage(
               id: id, // 将消息创建id传递给
               receiver: userID,
               groupID: "",
+              isExcludedFromUnreadCount: isExcludedFromUnreadCount,
+              isExcludedFromLastMessage: isExcludedFromLastMessage,
             );
     if (res.data != null) {
       for (int i = 0; i < _c2CMsgList.length; i++) {
@@ -332,12 +359,19 @@ class Chat with ChangeNotifier {
   }
 
   //发送 群聊 消息
-  sendGroupMessage(id, groupID) async {
+  sendGroupMessage(
+    String id,
+    String groupID, {
+    bool isExcludedFromUnreadCount = false,
+    bool isExcludedFromLastMessage = false,
+  }) async {
     V2TimValueCallback<V2TimMessage> res =
         await TencentImSDKPlugin.v2TIMManager.getMessageManager().sendMessage(
               id: id, // 将消息创建id传递给
               receiver: "",
               groupID: groupID,
+              isExcludedFromUnreadCount: isExcludedFromUnreadCount,
+              isExcludedFromLastMessage: isExcludedFromLastMessage,
             );
     if (res.data != null) {
       for (int i = 0; i < _groupMsgList.length; i++) {
@@ -363,29 +397,57 @@ class Chat with ChangeNotifier {
   }
 
   //获取单聊消息 最新的20条
-  getC2CMsgList(userID) async {
+  getC2CMsgList(userID, showName, context) async {
     _c2CMsgList = [];
     V2TimValueCallback<List<V2TimMessage>> res = await TencentImSDKPlugin
         .v2TIMManager
         .getMessageManager()
         .getC2CHistoryMessageList(
-          userID: userID,
+          userID: userID!,
           count: 20,
         );
     _c2CMsgList = res.data!;
     eventBus.fire(UpdateChatPageEvent(_c2CMsgList, false));
+
+    if (res.code == 0) {
+      _groupMsgList = res.data!;
+      Application.router.navigateTo(
+        context,
+        "/chatDetail",
+        transition: TransitionType.inFromRight,
+        routeSettings: RouteSettings(
+          arguments: {
+            "userID": userID,
+            "showName": showName,
+          },
+        ),
+      );
+    } else {
+      ErrorTips.errorMsg(res.code);
+    }
   }
 
   //获取群聊 最新的20条
-  getGroupMsgList(groupID) async {
+  getGroupMsgList(V2TimConversation item, context) async {
     _groupMsgList = [];
     V2TimValueCallback<List<V2TimMessage>> res = await TencentImSDKPlugin
         .v2TIMManager
         .getMessageManager()
-        .getGroupHistoryMessageList(groupID: groupID, count: 20);
+        .getGroupHistoryMessageList(groupID: item.groupID!, count: 20);
     if (res.code == 0) {
       _groupMsgList = res.data!;
-      eventBus.fire(UpdateGroupChatPageEvent(_groupMsgList));
+
+      Application.router.navigateTo(
+        context,
+        "/groupChatPage",
+        transition: TransitionType.inFromRight,
+        routeSettings: RouteSettings(
+          arguments: {
+            "groupID": item.groupID,
+            "showName": item.showName,
+          },
+        ),
+      );
     } else {
       ErrorTips.errorMsg(res.code);
     }
@@ -619,7 +681,13 @@ class Chat with ChangeNotifier {
       Fluttertoast.showToast(msg: "添加成功");
       createTextMsg("我通过了你的请求", userID, false);
       //发送不更新会话的消息
-      sendCustomMsg("PROMPT-你们已经是好友了", userID, false, true);
+      createCustomMsg(
+        "PROMPT-你们已经是好友了",
+        userID,
+        false,
+        isExcludedFromUnreadCount: true,
+        isExcludedFromLastMessage: true,
+      );
       Application.router.navigateTo(
         context,
         "/bottomNav",
@@ -672,6 +740,7 @@ class Chat with ChangeNotifier {
   //创建群聊
   createGroup(List<V2TimFriendInfo> memberList, context) async {
     List<V2TimGroupMember> list = [];
+
     for (V2TimFriendInfo item in memberList) {
       list.add(V2TimGroupMember(
           userID: item.userID,
@@ -680,7 +749,7 @@ class Chat with ChangeNotifier {
     V2TimValueCallback<String> res =
         await TencentImSDKPlugin.v2TIMManager.getGroupManager().createGroup(
               groupType: "Work", // 工作群
-              groupName: "groupName",
+              groupName: "群聊",
               notification: "工作群", // 群通告
               introduction: "工作群", // 群介绍
               isAllMuted: false, // 是否全员禁言
@@ -691,17 +760,15 @@ class Chat with ChangeNotifier {
 
     if (res.code == 0) {
       Fluttertoast.showToast(msg: "创建成功");
-      print("创建成功");
-      V2TimValueCallback<V2TimMsgCreateInfoResult> createMessage =
-          await TencentImSDKPlugin.v2TIMManager
-              .getMessageManager()
-              .createTextMessage(text: "加入群聊成功");
-      String id = createMessage.data!.id!; // 返回的消息创建id
 
-      _c2CMsgList.insert(0, createMessage.data!.messageInfo!);
-
-      eventBus.fire(UpdateChatPageEvent(_c2CMsgList, false));
-      sendGroupMessage(id, res.data);
+      //发送 不计入未读  消息
+      createCustomMsg(
+        "PROMPT-创建群聊成功",
+        res.data!,
+        true,
+        isExcludedFromUnreadCount: true,
+        isExcludedFromLastMessage: false,
+      );
 
       Application.router.navigateTo(
         context,

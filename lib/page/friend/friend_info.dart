@@ -21,6 +21,7 @@ class FriendInfoPage extends StatefulWidget {
 
 class _FriendInfoPageState extends State<FriendInfoPage> {
   var userID;
+  var showName = "";
   V2TimFriendInfoResult? _friendInfo;
 
   @override
@@ -29,7 +30,12 @@ class _FriendInfoPageState extends State<FriendInfoPage> {
     if (Provider.of<Chat>(context, listen: false).friendInfo.isNotEmpty) {
       _friendInfo = Provider.of<Chat>(context, listen: false).friendInfo[0];
       userID = _friendInfo!.friendInfo!.userProfile!.userID;
-      print(_friendInfo!.relation);
+      if (_friendInfo!.friendInfo!.friendRemark == "") {
+        showName = _friendInfo!.friendInfo!.userProfile!.nickName!;
+      } else {
+        showName = _friendInfo!.friendInfo!.friendRemark!;
+      }
+      setState(() {});
     }
   }
 
@@ -102,7 +108,7 @@ class _FriendInfoPageState extends State<FriendInfoPage> {
                 Container(
                   padding: EdgeInsets.only(bottom: 15.r),
                   child: Text(
-                    "${info.friendInfo!.userProfile!.nickName}",
+                    showName,
                     overflow: TextOverflow.ellipsis,
                     style: TextStyle(
                       fontSize: 50.sp,
@@ -190,17 +196,8 @@ class _FriendInfoPageState extends State<FriendInfoPage> {
         children: [
           InkWell(
             onTap: () {
-              Application.router.navigateTo(
-                context,
-                "/chatDetail",
-                transition: TransitionType.inFromRight,
-                routeSettings: RouteSettings(
-                  arguments: {
-                    "userID": userID,
-                    "showName": userID,
-                  },
-                ),
-              );
+              Provider.of<Chat>(context, listen: false)
+                  .getC2CMsgList(userID, showName, context);
             },
             child: Container(
               padding: EdgeInsets.all(20.r),

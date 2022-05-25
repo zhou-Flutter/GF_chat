@@ -145,7 +145,7 @@ class _FileMenuState extends State<FileMenu> {
         if (imageSize > res[i].size) {
           print(res[i].path);
           Provider.of<Chat>(context, listen: false)
-              .sendImageMsg(res[i].path, widget.converID, widget.isGroup);
+              .createImageMsg(res[i].path, widget.converID, widget.isGroup);
         } else {
           Fluttertoast.showToast(msg: "图片太大，无法发送");
         }
@@ -163,7 +163,7 @@ class _FileMenuState extends State<FileMenu> {
         if (imageSize > res[i].size) {
           print(res[i].path);
           Provider.of<Chat>(context, listen: false)
-              .sendImageMsg(res[i].path, widget.converID, widget.isGroup);
+              .createImageMsg(res[i].path, widget.converID, widget.isGroup);
         } else {
           Fluttertoast.showToast(msg: "图片太大，无法发送");
         }
@@ -187,7 +187,7 @@ class _FileMenuState extends State<FileMenu> {
           controller.initialize().then((value) {
             seconds = controller.value.duration.inSeconds;
 
-            Provider.of<Chat>(context, listen: false).sendVideoMsg(
+            Provider.of<Chat>(context, listen: false).createVideoMsg(
                 res[i].path,
                 "mp4",
                 seconds,

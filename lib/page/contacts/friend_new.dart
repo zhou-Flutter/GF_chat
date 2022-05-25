@@ -51,14 +51,18 @@ class _FriendNewPageState extends State<FriendNewPage> {
       body: SingleChildScrollView(
         child: applicationList!.isEmpty
             ? Container(
-                padding: EdgeInsets.all(100.r),
-                child: Text(
-                  "暂无好友申请",
-                  style: TextStyle(
-                    fontSize: 30.sp,
+                width: MediaQuery.of(context).size.width,
+                height: 200.h,
+                color: Colors.white,
+                child: Center(
+                  child: Text(
+                    "暂无好友申请",
+                    style: TextStyle(
+                      fontSize: 32.sp,
+                      color: Colors.black45,
+                    ),
                   ),
-                ),
-              )
+                ))
             : Column(
                 children: [
                   search(),

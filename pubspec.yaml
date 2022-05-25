@@ -105,6 +105,8 @@ dependencies:
   qr_flutter: ^4.0.0
   # 图片保存
   image_gallery_saver: ^1.7.1
+  # 数据库
+  sqflite: ^2.0.2
 
   # # 扫描二维码
   # mobile_scanner: ^1.0.0

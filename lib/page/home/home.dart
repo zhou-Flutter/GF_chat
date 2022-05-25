@@ -10,6 +10,8 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:my_chat/config/routes/application.dart';
 import 'package:my_chat/main.dart';
+import 'package:my_chat/page/home/component/c2c_converstation_item.dart';
+import 'package:my_chat/page/home/component/group_converstation_item.dart';
 import 'package:my_chat/page/home/component/slider_item.dart';
 
 import 'package:my_chat/page/widget/avatar.dart';
@@ -77,7 +79,7 @@ class _HomeState extends State<Home> {
         ],
       ),
       body: SingleChildScrollView(
-        physics: const NeverScrollableScrollPhysics(),
+        physics: const BouncingScrollPhysics(),
         child: Column(
           children: [
             search(),
@@ -88,7 +90,15 @@ class _HomeState extends State<Home> {
                     itemCount: currentMessageList.length,
                     physics: NeverScrollableScrollPhysics(),
                     itemBuilder: (context, index) {
-                      return chatView(currentMessageList[index]);
+                      if (currentMessageList[index].type == 1) {
+                        return C2cConverItem(
+                            key: UniqueKey(),
+                            conversation: currentMessageList[index]);
+                      } else {
+                        return GroupConverItem(
+                            key: UniqueKey(),
+                            conversation: currentMessageList[index]);
+                      }
                     },
                   ),
           ],
@@ -156,287 +166,5 @@ class _HomeState extends State<Home> {
         ),
       ),
     );
-  }
-
-  Widget chatView(V2TimConversation item) {
-    var time = item.lastMessage!.timestamp;
-    var recvOpt = item.recvOpt;
-    var createTime = RelativeDateFormat.timeToBefore(time!);
-
-    return SliderItem(
-      isPinned: item.isPinned!,
-      key: UniqueKey(),
-      onTap: () {
-        onTap(item);
-      },
-      child: Container(
-        padding: EdgeInsets.symmetric(horizontal: 25.r),
-        child: Row(
-          children: [
-            Container(
-              padding: EdgeInsets.only(right: 20.r),
-              child: Avatar(
-                size: 95.r,
-                isSelf: false,
-                faceUrl: item.faceUrl,
-              ),
-            ),
-            Expanded(
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  Container(
-                    child: Text(
-                      "${item.showName}",
-                      overflow: TextOverflow.ellipsis,
-                      style: TextStyle(
-                        fontSize: 35.sp,
-                      ),
-                    ),
-                  ),
-                  SizedBox(
-                    height: 5.h,
-                  ),
-                  msgStatus(item.lastMessage!)
-                ],
-              ),
-            ),
-            Container(
-              padding: EdgeInsets.all(20.r),
-              child: Column(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  Text(
-                    "${createTime}",
-                    style: TextStyle(
-                      fontSize: 20.sp,
-                      color: Colors.black26,
-                      fontWeight: FontWeight.w500,
-                    ),
-                  ),
-                  SizedBox(
-                    height: 10.h,
-                  ),
-                  item.unreadCount == 0
-                      ? Container()
-                      : Container(
-                          width: 30.r,
-                          height: 30.r,
-                          alignment: Alignment.center,
-                          decoration: BoxDecoration(
-                            color: Colors.red,
-                            borderRadius: BorderRadius.circular(50.r),
-                          ),
-                          child: Text(
-                            "${item.unreadCount}",
-                            style: TextStyle(
-                              color: Colors.white,
-                              fontSize: 20.sp,
-                            ),
-                          ),
-                        ),
-                ],
-              ),
-            )
-          ],
-        ),
-      ),
-      toppingChild: item.isPinned == true
-          ? Expanded(
-              flex: 3,
-              child: InkWell(
-                onTap: () {
-                  Provider.of<Chat>(context, listen: false)
-                      .pinConversation(item.conversationID, false);
-                },
-                child: Container(
-                  alignment: Alignment.center,
-                  color: Colors.blue,
-                  padding: EdgeInsets.symmetric(horizontal: 10.r),
-                  child: Text(
-                    "取消置顶",
-                    style: TextStyle(
-                      fontSize: 30.sp,
-                      color: Colors.white,
-                    ),
-                  ),
-                ),
-              ),
-            )
-          : Expanded(
-              flex: 2,
-              child: InkWell(
-                onTap: () {
-                  Provider.of<Chat>(context, listen: false)
-                      .pinConversation(item.conversationID, true);
-                },
-                child: Container(
-                  alignment: Alignment.center,
-                  color: Colors.blue,
-                  child: Text(
-                    "置顶",
-                    style: TextStyle(
-                      fontSize: 30.sp,
-                      color: Colors.white,
-                    ),
-                  ),
-                ),
-              )),
-      deleteChild: Expanded(
-        flex: 2,
-        child: InkWell(
-          onTap: () {
-            Provider.of<Chat>(context, listen: false)
-                .deleteConversation(item.conversationID);
-          },
-          child: Container(
-            alignment: Alignment.center,
-            color: Colors.red,
-            child: Text(
-              "删除",
-              style: TextStyle(
-                fontSize: 30.sp,
-                color: Colors.white,
-              ),
-            ),
-          ),
-        ),
-      ),
-    );
-  }
-
-  //消息状态
-  Widget msgStatus(V2TimMessage v2timMsg) {
-    var lastmsg = "";
-    switch (v2timMsg.elemType) {
-      case MessageElemType.V2TIM_ELEM_TYPE_TEXT:
-        lastmsg = v2timMsg.textElem!.text!;
-        break;
-      case MessageElemType.V2TIM_ELEM_TYPE_CUSTOM:
-        lastmsg = "[自定义消息]";
-        break;
-      case MessageElemType.V2TIM_ELEM_TYPE_IMAGE:
-        lastmsg = "[图片]";
-        break;
-      case MessageElemType.V2TIM_ELEM_TYPE_SOUND:
-        lastmsg = "[语音]";
-        break;
-      case MessageElemType.V2TIM_ELEM_TYPE_VIDEO:
-        lastmsg = "[视频]";
-        break;
-      case MessageElemType.V2TIM_ELEM_TYPE_FILE:
-        lastmsg = "[文件]";
-        break;
-      case MessageElemType.V2TIM_ELEM_TYPE_FACE:
-        lastmsg = "[表情包]";
-        break;
-      default:
-    }
-    switch (v2timMsg.status) {
-      case 0:
-        return Row(
-          children: [
-            Container(
-              child: Text(
-                "[发送中]",
-                style: TextStyle(
-                  color: Colors.black,
-                  fontSize: 25.sp,
-                ),
-              ),
-            ),
-            Container(
-              child: Text(
-                "${lastmsg}",
-                maxLines: 1,
-                overflow: TextOverflow.ellipsis,
-                style: TextStyle(
-                  color: Colors.black45,
-                  fontSize: 25.sp,
-                ),
-              ),
-            )
-          ],
-        );
-      case 2:
-        return Container(
-          child: Text(
-            "${lastmsg}",
-            maxLines: 1,
-            overflow: TextOverflow.ellipsis,
-            style: TextStyle(
-              color: Colors.black45,
-              fontSize: 25.sp,
-            ),
-          ),
-        );
-      case 3:
-        return Row(
-          children: [
-            Container(
-              child: Text(
-                "[发送失败]",
-                style: TextStyle(
-                  color: Colors.black,
-                  fontSize: 25.sp,
-                ),
-              ),
-            ),
-            Container(
-              child: Text(
-                lastmsg,
-                maxLines: 1,
-                overflow: TextOverflow.ellipsis,
-                style: TextStyle(
-                  color: Colors.black45,
-                  fontSize: 25.sp,
-                ),
-              ),
-            )
-          ],
-        );
-      case 6:
-        return Container(
-          child: Text(
-            v2timMsg.isSelf == true ? "你撤回了一条消息" : "对方撤回了一条消息",
-            style: TextStyle(
-              color: Colors.black45,
-              fontSize: 25.sp,
-            ),
-          ),
-        );
-      default:
-        return Container();
-    }
-  }
-
-  //页面跳转
-  onTap(V2TimConversation item) {
-    if (item.type == 1) {
-      Application.router.navigateTo(
-        context,
-        "/chatDetail",
-        transition: TransitionType.inFromRight,
-        routeSettings: RouteSettings(
-          arguments: {
-            "userID": item.userID,
-            "showName": item.showName,
-          },
-        ),
-      );
-    } else {
-      Application.router.navigateTo(
-        context,
-        "/groupChatPage",
-        transition: TransitionType.inFromRight,
-        routeSettings: RouteSettings(
-          arguments: {
-            "groupID": item.groupID,
-            "showName": item.showName,
-          },
-        ),
-      );
-    }
   }
 }

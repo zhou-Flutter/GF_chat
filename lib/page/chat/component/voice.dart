@@ -154,7 +154,7 @@ class _VoiceState extends State<Voice> {
           } else {
             print("发送语音");
 
-            Provider.of<Chat>(context, listen: false).sendSoundMsg(
+            Provider.of<Chat>(context, listen: false).createSoundMsg(
                 sendUrl, duration, widget.converID, widget.isGroup);
           }
           break;

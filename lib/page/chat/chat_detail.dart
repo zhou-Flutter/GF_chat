@@ -36,6 +36,8 @@ import 'package:tencent_im_sdk_plugin/models/v2_tim_message.dart';
 import 'dart:async';
 
 import 'package:flutter_spinkit/flutter_spinkit.dart';
+import 'package:tencent_im_sdk_plugin/models/v2_tim_value_callback.dart';
+import 'package:tencent_im_sdk_plugin/tencent_im_sdk_plugin.dart';
 
 class ChatDetailPage extends StatefulWidget {
   String? userID;
@@ -67,7 +69,8 @@ class _ChatDetailPageState extends State<ChatDetailPage> {
     super.initState();
 
     userID = widget.userID;
-    Provider.of<Chat>(context, listen: false).getC2CMsgList(userID);
+    // Provider.of<Chat>(context, listen: false).getC2CMsgList(userID);
+    c2CMsgList = Provider.of<Chat>(context, listen: false).c2CMsgList;
     Provider.of<Chat>(context, listen: false).setConverID(userID);
     Provider.of<Chat>(context, listen: false).chatPage(ChaPage.crc);
     Provider.of<Chat>(context, listen: false).clearC2CMsgUnRead(userID);

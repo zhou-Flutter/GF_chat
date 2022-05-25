@@ -13,6 +13,9 @@ import 'package:my_chat/utils/color_tools.dart';
 import 'package:my_chat/utils/event_bus.dart';
 
 import 'package:provider/provider.dart';
+import 'package:tencent_im_sdk_plugin/models/v2_tim_conversation.dart';
+import 'package:tencent_im_sdk_plugin/models/v2_tim_value_callback.dart';
+import 'package:tencent_im_sdk_plugin/tencent_im_sdk_plugin.dart';
 import 'package:text_span_field/text_span_builder.dart';
 import 'package:text_span_field/text_span_field.dart';
 
@@ -73,6 +76,8 @@ class _ButtonInputBoxState extends State<ButtonInputBox>
 
   var chatMsgHight; //所有消息高度
 
+  V2TimConversation? conversation;
+
   List fileMenu = [
     {"id": 0, "icon": 0xe7f1, "name": "相册", "type": "xc"},
     {"id": 1, "icon": 0xe61e, "name": "拍摄", "type": "pz"},
@@ -109,9 +114,35 @@ class _ButtonInputBoxState extends State<ButtonInputBox>
 
     textEditingController.addListener(() {
       inputContent = textEditingController.text;
-
       setState(() {});
     });
+    getDraftsText();
+  }
+
+  //获取草稿箱的类容
+  getDraftsText() async {
+    var conversationID = "";
+    if (widget.isGroup) {
+      conversationID = "group_${widget.converID}";
+    } else {
+      conversationID = "c2c_${widget.converID}";
+    }
+
+    V2TimValueCallback<V2TimConversation> res = await TencentImSDKPlugin
+        .v2TIMManager
+        .getConversationManager()
+        .getConversation(conversationID: conversationID);
+    if (res.data != null) {
+      conversation = res.data;
+      if (conversation!.draftText != null) {
+        if (conversation!.draftText!.isNotEmpty) {
+          textEditingController.text = conversation!.draftText!;
+          btnMeuType = BtnMeuType.key;
+          SystemChannels.textInput.invokeMethod<void>('TextInput.show');
+          FocusScope.of(context).requestFocus(_focusNode);
+        }
+      }
+    }
   }
 
   @override
@@ -139,6 +170,19 @@ class _ButtonInputBoxState extends State<ButtonInputBox>
         }
       });
     });
+  }
+
+  @override
+  void deactivate() {
+    // 设置草稿箱
+    if (textEditingController.text.isNotEmpty) {
+      Provider.of<Chat>(context, listen: false).setConversationDraft(
+          conversation!.conversationID, textEditingController.text);
+    } else {
+      Provider.of<Chat>(context, listen: false)
+          .setConversationDraft(conversation!.conversationID, null);
+    }
+    super.deactivate();
   }
 
   @override

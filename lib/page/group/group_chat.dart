@@ -51,7 +51,8 @@ class _GroupChatPageState extends State<GroupChatPage> {
   void initState() {
     super.initState();
     groupID = widget.groupID;
-    Provider.of<Chat>(context, listen: false).getGroupMsgList(groupID);
+    // Provider.of<Chat>(context, listen: false).getGroupMsgList(groupID);
+    groupMsgList = Provider.of<Chat>(context, listen: false).groupMsgList;
     Provider.of<Chat>(context, listen: false).setConverID(groupID);
     Provider.of<Chat>(context, listen: false).chatPage(ChaPage.group);
     Provider.of<GroupChat>(context, listen: false).clearGroupMsgUnRead(groupID);
@@ -76,7 +77,6 @@ class _GroupChatPageState extends State<GroupChatPage> {
 
   @override
   void dispose() {
-    // _animationController.dispose();
     audioPlayer.dispose();
     scrollController.dispose();
     _controller.dispose();
@@ -91,7 +91,7 @@ class _GroupChatPageState extends State<GroupChatPage> {
         leading: backBtn(context),
         centerTitle: true,
         title: Text(
-          "${widget.showName}",
+          widget.showName == " " ? "群聊" : "${widget.showName}",
           style: TextStyle(fontSize: 35.sp),
         ),
         actions: <Widget>[
@@ -132,7 +132,7 @@ class _GroupChatPageState extends State<GroupChatPage> {
                           footer: Commons.customFooter(),
                           child: ExtendedListView.builder(
                             addAutomaticKeepAlives: true,
-                            cacheExtent: 5000000,
+                            cacheExtent: 5000,
                             extendedListDelegate:
                                 ExtendedListDelegate(closeToTrailing: true),
                             controller: scrollController,
@@ -211,7 +211,7 @@ class _GroupChatPageState extends State<GroupChatPage> {
     switch (item.status) {
       case 6:
         return Text(
-          item.isSelf == true ? "你撤回了一条消息" : "对方撤回了一条消息",
+          item.isSelf == true ? "你撤回了一条消息" : "${item.nickName}撤回了一条消息",
           style: TextStyle(
             color: Colors.black38,
             fontSize: 25.sp,

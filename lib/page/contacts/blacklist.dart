@@ -6,6 +6,8 @@ import 'package:my_chat/provider/chat_provider.dart';
 import 'package:my_chat/utils/commons.dart';
 import 'package:provider/provider.dart';
 import 'package:tencent_im_sdk_plugin/models/v2_tim_friend_info.dart';
+import 'package:tencent_im_sdk_plugin/models/v2_tim_value_callback.dart';
+import 'package:tencent_im_sdk_plugin/tencent_im_sdk_plugin.dart';
 
 class BlackList extends StatefulWidget {
   BlackList({Key? key}) : super(key: key);
@@ -19,12 +21,26 @@ class _BlackListState extends State<BlackList> {
   @override
   void initState() {
     super.initState();
-    Provider.of<Chat>(context, listen: false).getBlackList();
+    // Provider.of<Chat>(context, listen: false).getBlackList();
+    getBlackList();
+  }
+
+  //获取黑名单
+  getBlackList() async {
+    V2TimValueCallback<List<V2TimFriendInfo>> res = await TencentImSDKPlugin
+        .v2TIMManager
+        .getFriendshipManager()
+        .getBlackList();
+    print("获取黑名单");
+    print(res.data);
+    if (res.data != null) {
+      blackList = res.data!;
+      setState(() {});
+    }
   }
 
   @override
   Widget build(BuildContext context) {
-    blackList = Provider.of<Chat>(context, listen: false).blackList;
     return Scaffold(
       appBar: AppBar(
         leading: backBtn(context),

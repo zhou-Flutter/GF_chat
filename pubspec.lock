@@ -413,6 +413,13 @@ packages:
       url: "https://pub.flutter-io.cn"
     source: hosted
     version: "4.5.0"
+  jverify:
+    dependency: "direct main"
+    description:
+      path: "plugins/jverify-flutter-plugin-master"
+      relative: true
+    source: path
+    version: "2.1.2"
   lints:
     dependency: transitive
     description:

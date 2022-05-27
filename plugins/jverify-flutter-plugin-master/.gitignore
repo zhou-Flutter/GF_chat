@@ -1,0 +1,12 @@
+.DS_Store
+.dart_tool/
+
+.packages
+.pub/
+
+build/
+.idea/
+.metadata
+pubspec.lock
+.last_build_id
+example/ios/Flutter/flutter_export_environment.sh

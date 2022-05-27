@@ -100,9 +100,13 @@ class Chat with ChangeNotifier {
     V2TimValueCallback<int> data = await TencentImSDKPlugin.v2TIMManager
         .getConversationManager()
         .getTotalUnreadMessageCount();
-
     _unreadCount = data.data!.bitLength;
+    notifyListeners();
+  }
 
+  //获取未读数总数 getTotalUnreadMessageCount 获取不到总未读数
+  getUnreadTotalCount(count) async {
+    _unreadCount = count;
     notifyListeners();
   }
 
@@ -225,7 +229,7 @@ class Chat with ChangeNotifier {
     }
   }
 
-  //发送 图片 消息
+  //创建 图片 消息
   createImageMsg(String imagePath, String converID, bool isGroup) async {
     V2TimValueCallback<V2TimMsgCreateInfoResult> createMessage =
         await TencentImSDKPlugin.v2TIMManager
@@ -244,7 +248,7 @@ class Chat with ChangeNotifier {
     }
   }
 
-  //发送 视频 消息
+  //创建 视频 消息
   createVideoMsg(String videoFilePath, String type, int duration,
       String snapshotPath, String converID, bool isGroup) async {
     V2TimValueCallback<V2TimMsgCreateInfoResult> createMessage =
@@ -269,7 +273,7 @@ class Chat with ChangeNotifier {
     }
   }
 
-  //发送 语言 消息
+  //创建 语言 消息
   createSoundMsg(
       String soundPath, int duration, String converID, bool isGroup) async {
     V2TimValueCallback<V2TimMsgCreateInfoResult> createMessage =
@@ -290,7 +294,7 @@ class Chat with ChangeNotifier {
   }
 
   /* 
-    ## 自定义消息
+    ##  创建自定义消息
     ## PROMPT- (不更新会话的提示类 自定义信息)
     ## CONCISE- (不更新会话的自我介绍 自定义信息)
     ## VOICECALL- (不更新未读数的语音通话 自定义信息)

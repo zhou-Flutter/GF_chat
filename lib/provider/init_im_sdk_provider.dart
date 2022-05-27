@@ -90,8 +90,7 @@ class InitIMSDKProvider with ChangeNotifier {
           onSyncServerFinish: () {},
           onSyncServerStart: () {},
           onTotalUnreadMessageCountChanged: (e) {
-            print("未读回调");
-            Provider.of<Chat>(context, listen: false).getUnreadCount();
+            Provider.of<Chat>(context, listen: false).getUnreadTotalCount(e);
           },
         ));
 

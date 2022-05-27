@@ -158,30 +158,39 @@ class _ContactsState extends State<Contacts> {
   }
 
   Widget search() {
-    return Container(
-      color: Colors.white,
+    return InkWell(
+      onTap: () {
+        Application.router.navigateTo(
+          context,
+          "/search",
+          transition: TransitionType.inFromRight,
+        );
+      },
       child: Container(
-        margin: EdgeInsets.symmetric(horizontal: 25.r, vertical: 25.r),
-        padding: EdgeInsets.symmetric(horizontal: 10.r, vertical: 15.r),
-        decoration: BoxDecoration(
-          color: HexColor.fromHex('#F5F7FB'),
-          borderRadius: BorderRadius.circular(15.r),
-        ),
-        child: Row(
-          crossAxisAlignment: CrossAxisAlignment.center,
-          children: [
-            Icon(
-              IconData(0xeafe, fontFamily: "icons"),
-              color: Colors.black26,
-            ),
-            Text(
-              "搜索",
-              style: TextStyle(
+        color: Colors.white,
+        child: Container(
+          margin: EdgeInsets.symmetric(horizontal: 25.r, vertical: 25.r),
+          padding: EdgeInsets.symmetric(horizontal: 10.r, vertical: 15.r),
+          decoration: BoxDecoration(
+            color: HexColor.fromHex('#F5F7FB'),
+            borderRadius: BorderRadius.circular(15.r),
+          ),
+          child: Row(
+            crossAxisAlignment: CrossAxisAlignment.center,
+            children: [
+              Icon(
+                IconData(0xeafe, fontFamily: "icons"),
                 color: Colors.black26,
-                fontSize: 28.sp,
               ),
-            )
-          ],
+              Text(
+                "搜索",
+                style: TextStyle(
+                  color: Colors.black26,
+                  fontSize: 28.sp,
+                ),
+              )
+            ],
+          ),
         ),
       ),
     );

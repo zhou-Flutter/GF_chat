@@ -1,0 +1,66 @@
+group 'com.jiguang.jverify'
+version '1.0-SNAPSHOT'
+
+buildscript {
+    repositories {
+        maven { url 'https://maven.aliyun.com/repository/public' }
+        maven { url 'https://maven.aliyun.com/repository/central' }
+        maven { url 'https://maven.aliyun.com/repository/jcenter' }
+        maven { url 'https://maven.aliyun.com/repository/google' }
+        maven { url 'https://maven.aliyun.com/repository/gradle-plugin' }
+        mavenLocal()
+        mavenCentral()
+    }
+
+    dependencies {
+        classpath 'com.android.tools.build:gradle:3.2.1'
+    }
+}
+
+rootProject.allprojects {
+    repositories {
+        maven { url 'https://maven.aliyun.com/repository/public' }
+        maven { url 'https://maven.aliyun.com/repository/central' }
+        maven { url 'https://maven.aliyun.com/repository/jcenter' }
+        maven { url 'https://maven.aliyun.com/repository/google' }
+        maven { url 'https://maven.aliyun.com/repository/gradle-plugin' }
+        mavenLocal()
+        mavenCentral()
+    }
+}
+
+apply plugin: 'com.android.library'
+
+android {
+    compileSdkVersion 28
+
+    defaultConfig {
+        minSdkVersion 17
+        testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
+    }
+
+    lintOptions {
+        disable 'InvalidPackage'
+    }
+    buildTypes {
+        release {
+            minifyEnabled true
+            useProguard true
+            // library 混淆 -> 随 library 引用，自动添加到 apk 打包混淆
+            proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'consumer-rules.pro'
+        }
+        debug {
+            minifyEnabled false
+            useProguard false
+            proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'consumer-rules.pro'
+        }
+    }
+
+
+}
+
+dependencies {
+//    implementation fileTree(include: '*.aar', dir: 'libs')
+    implementation 'cn.jiguang.sdk:jcore:2.8.2'
+    implementation 'cn.jiguang.sdk:jverification:2.7.2'
+}

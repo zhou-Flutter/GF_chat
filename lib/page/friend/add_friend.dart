@@ -62,15 +62,17 @@ class _AddFriendPageState extends State<AddFriendPage>
   void didChangeMetrics() {
     super.didChangeMetrics();
     WidgetsBinding.instance!.addPostFrameCallback((_) {
-      setState(() {
-        if (MediaQuery.of(context).viewInsets.bottom == 0) {
-          //关闭键盘
-          isShow = false;
-        } else {
-          //显示键盘
-          isShow = true;
-        }
-      });
+      if (mounted) {
+        setState(() {
+          if (MediaQuery.of(context).viewInsets.bottom == 0) {
+            //关闭键盘
+            isShow = false;
+          } else {
+            //显示键盘
+            isShow = true;
+          }
+        });
+      }
     });
   }
 
@@ -78,6 +80,10 @@ class _AddFriendPageState extends State<AddFriendPage>
   searchFriend() async {
     Provider.of<Chat>(context, listen: false)
         .getFriendsInfo(inputValue, context);
+    textEditingController.clear();
+    inputValue = "";
+    FocusScope.of(context).unfocus();
+    setState(() {});
   }
 
   @override

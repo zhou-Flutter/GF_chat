@@ -134,19 +134,23 @@ class _HomeState extends State<Home> {
 
   //搜索
   Widget search() {
-    return Container(
-      color: Colors.white,
+    return InkWell(
+      onTap: () {
+        Application.router.navigateTo(
+          context,
+          "/search",
+          transition: TransitionType.inFromRight,
+        );
+      },
       child: Container(
-        margin: EdgeInsets.only(right: 25.r, left: 25.r, bottom: 25.r),
-        padding: EdgeInsets.symmetric(horizontal: 10.r, vertical: 15.r),
-        decoration: BoxDecoration(
-          color: HexColor.fromHex('#F5F7FB'),
-          borderRadius: BorderRadius.circular(15.r),
-        ),
-        child: InkWell(
-          onTap: () {
-            print("跳转到搜索页面");
-          },
+        color: Colors.white,
+        child: Container(
+          margin: EdgeInsets.only(right: 25.r, left: 25.r, bottom: 25.r),
+          padding: EdgeInsets.symmetric(horizontal: 10.r, vertical: 15.r),
+          decoration: BoxDecoration(
+            color: HexColor.fromHex('#F5F7FB'),
+            borderRadius: BorderRadius.circular(15.r),
+          ),
           child: Row(
             crossAxisAlignment: CrossAxisAlignment.center,
             children: [

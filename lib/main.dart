@@ -7,6 +7,7 @@ import 'package:flutter/services.dart';
 import 'package:flutter_easyloading/flutter_easyloading.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:fluttertoast/fluttertoast.dart';
 import 'package:my_chat/config/routes/application.dart';
 import 'package:my_chat/config/routes/routes.dart';
 import 'package:my_chat/config/style/app_theme.dart';

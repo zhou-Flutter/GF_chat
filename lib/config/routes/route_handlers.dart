@@ -5,7 +5,7 @@ import 'package:my_chat/page/bottomtab/bottom_navigation.dart';
 import 'package:my_chat/page/chat/chat_detail.dart';
 import 'package:my_chat/page/chat/component/photo_view.dart';
 import 'package:my_chat/page/chat/component/video_play.dart';
-import 'package:my_chat/page/chat/chat_setting.dart';
+import 'package:my_chat/page/contacts/chat_setting.dart';
 import 'package:my_chat/page/contacts/blacklist.dart';
 import 'package:my_chat/page/contacts/consent_verified.dart';
 import 'package:my_chat/page/friend/add_friend.dart';
@@ -21,6 +21,7 @@ import 'package:my_chat/page/group/group_list.dart';
 
 import 'package:my_chat/page/login/login.dart';
 import 'package:my_chat/page/login/mobile_num_login.dart';
+import 'package:my_chat/page/search/search.dart';
 import 'package:my_chat/page/self_info/self_info.dart';
 import 'package:my_chat/page/self_info/self_qr.dart';
 import 'package:my_chat/page/setup/permission.dart';
@@ -176,4 +177,9 @@ var groupChatSettingHandler = Handler(
   return GroupChatSetting(
     groupID: args['groupID'],
   );
+});
+
+var searchHandler = Handler(
+    handlerFunc: (BuildContext? context, Map<String, List<String>> params) {
+  return Search();
 });

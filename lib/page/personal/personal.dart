@@ -20,10 +20,30 @@ class _PersonalState extends State<Personal> {
   List<V2TimUserFullInfo> selfInfo = [];
   var isshow = true;
   final List _list = [
-    {"id": 1, "icon": 0xe632, "name": "收藏", "iconColor": Colors.green},
-    {"id": 2, "icon": 0xe7f2, "name": "表情", "iconColor": Colors.pink},
-    {"id": 3, "icon": 0xe606, "name": "实验室", "iconColor": Colors.blue},
-    {"id": 4, "icon": 0xe867, "name": "更多", "iconColor": Colors.purple},
+    {
+      "id": 1,
+      "icon": 0xe632,
+      "name": "收藏",
+      "iconColor": HexColor.fromHex('#5CACEE')
+    },
+    {
+      "id": 2,
+      "icon": 0xe7f2,
+      "name": "表情",
+      "iconColor": HexColor.fromHex('#66CDAA'),
+    },
+    {
+      "id": 3,
+      "icon": 0xe606,
+      "name": "实验室",
+      "iconColor": HexColor.fromHex('#EE7942'),
+    },
+    {
+      "id": 4,
+      "icon": 0xe867,
+      "name": "更多",
+      "iconColor": HexColor.fromHex('#EEAD0E'),
+    },
   ];
 
   @override
@@ -145,17 +165,27 @@ class _PersonalState extends State<Personal> {
                 ? Container()
                 : Divider(
                     height: 1.r,
-                    indent: 80.r,
+                    indent: 100.r,
                     color: Colors.black12,
                   ),
             Container(
-              padding: EdgeInsets.all(25.r),
+              padding: EdgeInsets.symmetric(horizontal: 35.r),
               child: Row(
                 children: [
-                  Icon(
-                    IconData(e["icon"], fontFamily: "icons"),
-                    size: 45.r,
-                    color: e["iconColor"],
+                  Container(
+                    height: 60.r,
+                    width: 60.r,
+                    margin:
+                        EdgeInsets.only(top: 15.r, bottom: 15.r, right: 10.r),
+                    decoration: BoxDecoration(
+                      borderRadius: BorderRadius.circular(15.r),
+                      color: e["iconColor"],
+                    ),
+                    child: Icon(
+                      IconData(e["icon"], fontFamily: "icons"),
+                      size: 35.r,
+                      color: Colors.white,
+                    ),
                   ),
                   SizedBox(width: 15.r),
                   Text(
@@ -189,13 +219,22 @@ class _PersonalState extends State<Personal> {
         );
       },
       child: Container(
-        padding: EdgeInsets.all(20.r),
+        padding: EdgeInsets.symmetric(horizontal: 35.r),
         child: Row(
           children: [
-            Icon(
-              IconData(0xe699, fontFamily: "icons"),
-              size: 45.r,
-              color: Colors.blue,
+            Container(
+              height: 60.r,
+              width: 60.r,
+              margin: EdgeInsets.only(top: 15.r, bottom: 15.r, right: 10.r),
+              decoration: BoxDecoration(
+                borderRadius: BorderRadius.circular(15.r),
+                color: HexColor.fromHex('#87CEFA'),
+              ),
+              child: Icon(
+                IconData(0xe699, fontFamily: "icons"),
+                size: 45.r,
+                color: Colors.white,
+              ),
             ),
             SizedBox(width: 15.r),
             Text(

@@ -31,7 +31,7 @@ class BottomNavState extends State<BottomNav>
   List<Widget> pages = [
     Home(),
     Contacts(),
-    Communal(),
+    // Communal(),
     Personal(),
   ];
   int _currentIndex = 0;
@@ -40,13 +40,14 @@ class BottomNavState extends State<BottomNav>
   List butIcon = [
     {"id": 1, "icon": 0xe614, "name": "消息", "unRead": 0},
     {"id": 2, "icon": 0xe6c2, "name": "朋友", "unRead": 0},
-    {"id": 3, "icon": 0xe65b, "name": "社区", "unRead": 0},
-    {"id": 4, "icon": 0xe7ea, "name": "我", "unRead": 0},
+    // {"id": 3, "icon": 0xe65b, "name": "社区", "unRead": 0},
+    {"id": 3, "icon": 0xe7ea, "name": "我", "unRead": 0},
   ];
 
   @override
   void initState() {
     _controller = PageController(initialPage: 0);
+
     var userId = Provider.of<InitIMSDKProvider>(context, listen: false).selfId;
     Provider.of<Chat>(context, listen: false).getUnreadCount();
     Provider.of<Chat>(context, listen: false)
@@ -86,7 +87,7 @@ class BottomNavState extends State<BottomNav>
       _bottomNavBarItem(butIcon[0]),
       _bottomNavBarItem(butIcon[1]),
       _bottomNavBarItem(butIcon[2]),
-      _bottomNavBarItem(butIcon[3])
+      // _bottomNavBarItem(butIcon[3])
     ];
     return Scaffold(
       body: pages[_currentIndex],
@@ -96,8 +97,10 @@ class BottomNavState extends State<BottomNav>
           _currentIndex = index;
           setState(() {});
         },
+        elevation: 1,
+        backgroundColor: Colors.white,
         type: BottomNavigationBarType.fixed,
-        iconSize: 28,
+        iconSize: 35,
         fixedColor: HexColor.fromHex('#9266F3'),
         unselectedItemColor: Colors.black26,
         selectedFontSize: 12,

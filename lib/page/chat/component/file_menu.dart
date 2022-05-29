@@ -1,9 +1,11 @@
 import 'dart:io';
 
+import 'package:fluro/fluro.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:images_picker/images_picker.dart';
+import 'package:my_chat/config/routes/application.dart';
 import 'package:my_chat/provider/chat_provider.dart';
 import 'package:my_chat/provider/init_provider.dart';
 import 'package:my_chat/provider/login_provider.dart';
@@ -128,7 +130,11 @@ class _FileMenuState extends State<FileMenu> {
         Fluttertoast.showToast(msg: "视频通话还在开发中");
         break;
       case 5:
-        Fluttertoast.showToast(msg: "红包还在开发中");
+        Application.router.navigateTo(
+          context,
+          "/maps",
+          transition: TransitionType.inFromRight,
+        );
         break;
       default:
         Fluttertoast.showToast(msg: "功能还在开发中");

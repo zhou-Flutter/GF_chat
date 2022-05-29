@@ -33,6 +33,7 @@ class Routes {
   static String groupChatPage = "/groupChatPage"; //群聊页面
   static String groupChatSetting = "/groupChatSetting"; //群聊设置
   static String search = "/search"; //搜索
+  static String maps = "/maps"; //地图
 
   static void configureRoutes(FluroRouter router) {
     router.notFoundHandler = Handler(
@@ -66,6 +67,7 @@ class Routes {
     router.define(groupChatPage, handler: groupChatPageHandler);
     router.define(groupChatSetting, handler: groupChatSettingHandler);
     router.define(search, handler: searchHandler);
+    router.define(maps, handler: mapsHandler);
   }
 
   // 对参数进行encode，解决参数中有特殊字符

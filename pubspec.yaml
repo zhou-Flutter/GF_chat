@@ -60,7 +60,7 @@ dependencies:
   # 汉字转拼音
   lpinyin: ^2.0.3
   # 弹出菜单
-  custom_pop_up_menu: ^1.2.3+1
+  custom_pop_up_menu: 1.2.3
   # IM
   tencent_im_sdk_plugin: ^4.0.0
   # 腾讯云音视频
@@ -107,10 +107,12 @@ dependencies:
   image_gallery_saver: ^1.7.1
   # 数据库
   sqflite: ^2.0.2
-  # # 极光插件
-  # jverify: ^2.2.4
+  
+  # 高德地图
+  amap_flutter_map: ^3.0.0
+  amap_flutter_location: ^3.0.0
 
-  #本地插件引用
+  #本地插件引用 极光插件
   jverify:
     path: plugins/jverify-flutter-plugin-master
 
@@ -129,6 +131,7 @@ dependencies:
   # The following adds the Cupertino Icons font to your application.
   # Use with the CupertinoIcons class for iOS style icons.
   cupertino_icons: ^1.0.2
+  
   
 #app图标
 flutter_icons:

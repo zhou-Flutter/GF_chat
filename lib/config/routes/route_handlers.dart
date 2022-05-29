@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 
 import 'package:my_chat/page/bottomtab/bottom_navigation.dart';
 import 'package:my_chat/page/chat/chat_detail.dart';
+
 import 'package:my_chat/page/chat/component/photo_view.dart';
 import 'package:my_chat/page/chat/component/video_play.dart';
 import 'package:my_chat/page/contacts/chat_setting.dart';
@@ -21,6 +22,7 @@ import 'package:my_chat/page/group/group_list.dart';
 
 import 'package:my_chat/page/login/login.dart';
 import 'package:my_chat/page/login/mobile_num_login.dart';
+import 'package:my_chat/page/map/map.dart';
 import 'package:my_chat/page/search/search.dart';
 import 'package:my_chat/page/self_info/self_info.dart';
 import 'package:my_chat/page/self_info/self_qr.dart';
@@ -182,4 +184,9 @@ var groupChatSettingHandler = Handler(
 var searchHandler = Handler(
     handlerFunc: (BuildContext? context, Map<String, List<String>> params) {
   return Search();
+});
+
+var mapsHandler = Handler(
+    handlerFunc: (BuildContext? context, Map<String, List<String>> params) {
+  return Maps();
 });

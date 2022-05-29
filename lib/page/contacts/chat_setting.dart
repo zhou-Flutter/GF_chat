@@ -6,6 +6,7 @@ import 'package:my_chat/page/contacts/component/block_person.dart';
 import 'package:my_chat/page/widget/avatar.dart';
 import 'package:my_chat/page/widget/common_dialog.dart';
 import 'package:my_chat/provider/chat_provider.dart';
+import 'package:my_chat/provider/friend_provider.dart';
 import 'package:my_chat/utils/color_tools.dart';
 import 'package:my_chat/utils/commons.dart';
 import 'package:provider/provider.dart';
@@ -59,7 +60,7 @@ class _ChatSettingState extends State<ChatSetting> {
           subtitle: "将该联系人删除，将同时删除与该联系人的聊天记录",
           sure: "删除",
           clickCallback: () {
-            Provider.of<Chat>(context, listen: false)
+            Provider.of<Friend>(context, listen: false)
                 .deleteFromFriendList(widget.userID, context);
           },
         );

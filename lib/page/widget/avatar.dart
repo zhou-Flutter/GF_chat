@@ -2,6 +2,7 @@ import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:my_chat/provider/chat_provider.dart';
+import 'package:my_chat/provider/friend_provider.dart';
 import 'package:provider/provider.dart';
 
 class Avatar extends StatelessWidget {
@@ -18,7 +19,7 @@ class Avatar extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     var faceUrlMe =
-        Provider.of<Chat>(context, listen: false).selfInfo[0].faceUrl;
+        Provider.of<Friend>(context, listen: false).selfInfo[0].faceUrl;
     return Container(
       child: isSelf == true
           ? Container(

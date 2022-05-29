@@ -3,7 +3,8 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:my_chat/config/routes/application.dart';
 
 import 'package:my_chat/page/widget/avatar.dart';
-import 'package:my_chat/provider/init_im_sdk_provider.dart';
+import 'package:my_chat/provider/init_provider.dart';
+import 'package:my_chat/provider/login_provider.dart';
 import 'package:my_chat/provider/trtc_provider.dart';
 import 'package:my_chat/utils/event_bus.dart';
 import 'package:provider/provider.dart';
@@ -24,7 +25,7 @@ class _VoiceCallPageState extends State<VoiceCallPage> {
   void initState() {
     super.initState();
     Provider.of<Trtc>(context, listen: false).floatHide();
-    selfId = Provider.of<InitIMSDKProvider>(context, listen: false).selfId;
+    selfId = Provider.of<Login>(context, listen: false).selfId;
 
     //接收是否有滑块激活
     eventBus.on<NoticeEvent>().listen((event) {

@@ -5,6 +5,7 @@ import 'package:my_chat/config/routes/application.dart';
 import 'package:my_chat/page/home/component/group_avatar.dart';
 import 'package:my_chat/page/widget/avatar.dart';
 import 'package:my_chat/provider/chat_provider.dart';
+import 'package:my_chat/provider/friend_provider.dart';
 import 'package:my_chat/utils/color_tools.dart';
 import 'package:my_chat/utils/commons.dart';
 import 'package:provider/provider.dart';
@@ -27,7 +28,8 @@ class _GroupListState extends State<GroupList> {
   @override
   void initState() {
     super.initState();
-    joinedGroupList = Provider.of<Chat>(context, listen: false).joinedGroupList;
+    joinedGroupList =
+        Provider.of<Friend>(context, listen: false).joinedGroupList;
   }
 
   @override

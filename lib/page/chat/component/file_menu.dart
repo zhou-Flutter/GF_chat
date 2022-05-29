@@ -5,7 +5,8 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:images_picker/images_picker.dart';
 import 'package:my_chat/provider/chat_provider.dart';
-import 'package:my_chat/provider/init_im_sdk_provider.dart';
+import 'package:my_chat/provider/init_provider.dart';
+import 'package:my_chat/provider/login_provider.dart';
 import 'package:my_chat/provider/trtc_provider.dart';
 import 'package:my_chat/utils/color_tools.dart';
 import 'package:my_chat/utils/commons.dart';
@@ -44,7 +45,7 @@ class _FileMenuState extends State<FileMenu> {
   void initState() {
     // TODO: implement initState
     super.initState();
-    selfId = Provider.of<InitIMSDKProvider>(context, listen: false).selfId;
+    selfId = Provider.of<Login>(context, listen: false).selfId;
   }
 
   @override

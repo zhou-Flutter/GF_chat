@@ -11,7 +11,7 @@ import 'package:flutter_floating/floating/manager/floating_manager.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:my_chat/config/routes/application.dart';
 import 'package:my_chat/main.dart';
-import 'package:my_chat/provider/init_im_sdk_provider.dart';
+import 'package:my_chat/provider/init_provider.dart';
 import 'package:my_chat/provider/trtc_provider.dart';
 import 'package:provider/provider.dart';
 

@@ -5,6 +5,7 @@ import 'package:my_chat/config/routes/application.dart';
 
 import 'package:my_chat/page/widget/avatar.dart';
 import 'package:my_chat/provider/chat_provider.dart';
+import 'package:my_chat/provider/friend_provider.dart';
 import 'package:my_chat/utils/color_tools.dart';
 import 'package:my_chat/utils/commons.dart';
 import 'package:my_chat/utils/constant.dart';
@@ -23,8 +24,9 @@ class _FriendNewPageState extends State<FriendNewPage> {
   @override
   void initState() {
     super.initState();
-    applicationList = Provider.of<Chat>(context, listen: false).applicationList;
-    Provider.of<Chat>(context, listen: false).setFriendApplicationRead();
+    applicationList =
+        Provider.of<Friend>(context, listen: false).applicationList;
+    Provider.of<Friend>(context, listen: false).setFriendApplicationRead();
   }
 
   @override
@@ -168,7 +170,7 @@ class _FriendNewPageState extends State<FriendNewPage> {
       case 1:
         return InkWell(
           onTap: () {
-            Provider.of<Chat>(context, listen: false)
+            Provider.of<Friend>(context, listen: false)
                 .acceptFriendApplication(item.userID, context);
           },
           child: Container(

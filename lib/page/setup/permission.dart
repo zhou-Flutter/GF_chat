@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:my_chat/provider/chat_provider.dart';
+import 'package:my_chat/provider/friend_provider.dart';
 import 'package:my_chat/utils/commons.dart';
 import 'package:provider/provider.dart';
 import 'package:tencent_im_sdk_plugin/enum/user_info_allow_type.dart';
@@ -23,7 +24,7 @@ class _PermissionState extends State<Permission> {
   void initState() {
     // TODO: implement initState
     super.initState();
-    selfInfo = Provider.of<Chat>(context, listen: false).selfInfo;
+    selfInfo = Provider.of<Friend>(context, listen: false).selfInfo;
     if (selfInfo.isNotEmpty) {
       info = selfInfo[0];
       print(info!.allowType);

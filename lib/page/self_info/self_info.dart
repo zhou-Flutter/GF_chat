@@ -5,6 +5,7 @@ import 'package:my_chat/config/routes/application.dart';
 
 import 'package:my_chat/page/widget/avatar.dart';
 import 'package:my_chat/provider/chat_provider.dart';
+import 'package:my_chat/provider/friend_provider.dart';
 import 'package:my_chat/utils/color_tools.dart';
 import 'package:my_chat/utils/commons.dart';
 import 'package:provider/provider.dart';
@@ -24,7 +25,7 @@ class _SelfInfoPageState extends State<SelfInfoPage> {
   @override
   void initState() {
     super.initState();
-    selfInfo = Provider.of<Chat>(context, listen: false).selfInfo;
+    selfInfo = Provider.of<Friend>(context, listen: false).selfInfo;
     if (selfInfo.isNotEmpty) {
       info = selfInfo[0];
       setState(() {});

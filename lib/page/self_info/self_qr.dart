@@ -7,6 +7,7 @@ import 'package:flutter_easyloading/flutter_easyloading.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:image_gallery_saver/image_gallery_saver.dart';
 import 'package:my_chat/provider/chat_provider.dart';
+import 'package:my_chat/provider/friend_provider.dart';
 import 'package:my_chat/utils/commons.dart';
 import 'package:permission_handler/permission_handler.dart';
 import 'package:provider/provider.dart';
@@ -35,7 +36,7 @@ class _SelfQrState extends State<SelfQr> {
   void initState() {
     // TODO: implement initState
     super.initState();
-    selfInfo = Provider.of<Chat>(context, listen: false).selfInfo;
+    selfInfo = Provider.of<Friend>(context, listen: false).selfInfo;
     if (selfInfo.isNotEmpty) {
       info = selfInfo[0];
       setState(() {});

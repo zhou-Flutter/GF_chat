@@ -6,6 +6,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:fluttertoast/fluttertoast.dart';
+import 'package:jverify/jverify.dart';
 import 'package:mask_text_input_formatter/mask_text_input_formatter.dart';
 import 'package:my_chat/config/routes/application.dart';
 import 'package:my_chat/utils/color_tools.dart';
@@ -32,6 +33,18 @@ class _MobileNumLoginPageState extends State<MobileNumLoginPage> {
   bool isSelect = false; //是否选择同意协议
 
   var _autoCodeText;
+
+  /// 统一 key
+  final String f_result_key = "result";
+
+  /// 错误码
+  final String f_code_key = "code";
+
+  /// 回调的提示信息，统一返回 flutter 为 message
+  final String f_msg_key = "message";
+
+  //初始化极光插件
+  final Jverify jverify = new Jverify();
 
   var maskFormatter = MaskTextInputFormatter(
       mask: '### ### ####',
@@ -69,9 +82,25 @@ class _MobileNumLoginPageState extends State<MobileNumLoginPage> {
     });
   }
 
+  /// 获取短信验证码
+  void getSMSCode() {
+    jverify.checkVerifyEnable().then((map) {
+      bool result = map[f_result_key];
+      if (result) {
+        jverify.getSMSCode(phoneNum: "15346983027").then((map) {
+          print("获取短信验证码：${map.toString()}");
+          int code = map[f_code_key];
+          String message = map[f_msg_key];
+          _startTimer();
+        });
+      } else {
+        print("网络环境不支持");
+      }
+    });
+  }
+
   //倒计时
   void _startTimer() {
-    Fluttertoast.showToast(msg: "短信验证码已发送，请注意查收");
     vCodeSta = VerifyCodeSta.isSend;
     _timer = Timer.periodic(
       const Duration(seconds: 1),
@@ -366,13 +395,14 @@ class _MobileNumLoginPageState extends State<MobileNumLoginPage> {
     );
   }
 
+  //登录按钮
   Widget MobileNumLogin() {
     return Stack(
       alignment: AlignmentDirectional.center,
       children: [
         InkWell(
           onTap: () {
-            print("登录");
+            Fluttertoast.showToast(msg: "模拟登录");
           },
           child: Container(
             alignment: Alignment.center,
@@ -403,9 +433,7 @@ class _MobileNumLoginPageState extends State<MobileNumLoginPage> {
           child: btnDis == false
               ? Container()
               : InkWell(
-                  onTap: () {
-                    print("你好");
-                  },
+                  onTap: () {},
                   child: Container(
                     alignment: Alignment.center,
                     padding: const EdgeInsets.all(15),
@@ -488,6 +516,8 @@ class _MobileNumLoginPageState extends State<MobileNumLoginPage> {
         return InkWell(
           onTap: () {
             print("点击获取验证码，倒计时");
+            Fluttertoast.showToast(msg: "模拟发送，因为政策原因，暂无法发送验证码");
+            // getSMSCode();
             _startTimer();
           },
           child: Text(

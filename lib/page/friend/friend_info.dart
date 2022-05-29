@@ -6,6 +6,7 @@ import 'package:my_chat/config/routes/application.dart';
 
 import 'package:my_chat/page/widget/avatar.dart';
 import 'package:my_chat/provider/chat_provider.dart';
+import 'package:my_chat/provider/friend_provider.dart';
 import 'package:my_chat/utils/commons.dart';
 import 'package:my_chat/utils/constant.dart';
 import 'package:provider/provider.dart';
@@ -27,8 +28,8 @@ class _FriendInfoPageState extends State<FriendInfoPage> {
   @override
   void initState() {
     super.initState();
-    if (Provider.of<Chat>(context, listen: false).friendInfo.isNotEmpty) {
-      _friendInfo = Provider.of<Chat>(context, listen: false).friendInfo[0];
+    if (Provider.of<Friend>(context, listen: false).friendInfo.isNotEmpty) {
+      _friendInfo = Provider.of<Friend>(context, listen: false).friendInfo[0];
       userID = _friendInfo!.friendInfo!.userProfile!.userID;
       if (_friendInfo!.friendInfo!.friendRemark == "") {
         showName = _friendInfo!.friendInfo!.userProfile!.nickName!;

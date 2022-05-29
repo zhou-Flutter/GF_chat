@@ -64,7 +64,7 @@ android {
         manifestPlaceholders = [
                 TENCENT_APP_ID: "102005320",//腾讯QQ AppId
                 PUSH_PKGNAME : applicationId,
-			    JPUSH_APPKEY : "683e39a84c5223571f27216e", // NOTE: JPush 上注册的包名对应的 Appkey.
+			    JPUSH_APPKEY : "d0443639315b0672ff9e161b", // NOTE: JPush 上注册的包名对应的 Appkey.
 			    JPUSH_CHANNEL : "developer-default", //暂时填写默认值即可.
         ]
     }

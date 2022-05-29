@@ -13,7 +13,8 @@ import 'package:my_chat/config/routes/application.dart';
 import 'package:my_chat/page/widget/agreement_dialog.dart';
 
 import 'package:my_chat/provider/common_provider.dart';
-import 'package:my_chat/provider/init_im_sdk_provider.dart';
+import 'package:my_chat/provider/init_provider.dart';
+import 'package:my_chat/provider/login_provider.dart';
 import 'package:my_chat/utils/constant.dart';
 import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -42,7 +43,7 @@ class _SplashState extends State<Splash> with WidgetsBindingObserver {
     if (prefs.getInt("isShow") == null) {
       _downloadDialog();
     } else {
-      Provider.of<InitIMSDKProvider>(context, listen: false).getUserID(context);
+      Provider.of<Login>(context, listen: false).getUserID(context);
     }
   }
 

@@ -14,7 +14,7 @@ import 'package:my_chat/page/chat/component/msg_video.dart';
 import 'package:my_chat/page/chat/component/msg_voice.dart';
 import 'package:my_chat/page/widget/agreement_dialog.dart';
 import 'package:my_chat/provider/chat_provider.dart';
-import 'package:my_chat/provider/group_chat_provider.dart';
+import 'package:my_chat/provider/friend_provider.dart';
 import 'package:my_chat/utils/color_tools.dart';
 import 'package:my_chat/utils/commons.dart';
 import 'package:my_chat/utils/event_bus.dart';
@@ -55,7 +55,7 @@ class _GroupChatPageState extends State<GroupChatPage> {
     groupMsgList = Provider.of<Chat>(context, listen: false).groupMsgList;
     Provider.of<Chat>(context, listen: false).setConverID(groupID);
     Provider.of<Chat>(context, listen: false).chatPage(ChaPage.group);
-    Provider.of<GroupChat>(context, listen: false).clearGroupMsgUnRead(groupID);
+    Provider.of<Chat>(context, listen: false).clearGroupMsgUnRead(groupID);
 
     //更新聊天页面
     eventBus.on<UpdateGroupChatPageEvent>().listen((event) {
@@ -101,7 +101,7 @@ class _GroupChatPageState extends State<GroupChatPage> {
                 color: Colors.black,
               ),
               onPressed: () {
-                Provider.of<GroupChat>(context, listen: false)
+                Provider.of<Friend>(context, listen: false)
                     .getGroupMemberList(groupID, context);
               }),
         ],
@@ -146,7 +146,8 @@ class _GroupChatPageState extends State<GroupChatPage> {
                           onLoad: () async {
                             Future.delayed(const Duration(seconds: 1), () {
                               Provider.of<Chat>(context, listen: false)
-                                  .getC2CHistoryMsgList(groupID, groupMsgList);
+                                  .getGroupHistoryMsgList(
+                                      groupID, groupMsgList);
                             });
                           },
                         ),

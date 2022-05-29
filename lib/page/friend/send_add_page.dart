@@ -3,6 +3,7 @@ import 'package:flutter/services.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:my_chat/config/routes/application.dart';
 import 'package:my_chat/provider/chat_provider.dart';
+import 'package:my_chat/provider/friend_provider.dart';
 import 'package:my_chat/utils/color_tools.dart';
 import 'package:my_chat/utils/constant.dart';
 import 'package:provider/provider.dart';
@@ -152,7 +153,7 @@ class _SendAddPageState extends State<SendAddPage> {
   Widget send() {
     return InkWell(
       onTap: () {
-        Provider.of<Chat>(context, listen: false).addFriend(
+        Provider.of<Friend>(context, listen: false).addFriend(
           widget.userID,
           context,
           addWording,

@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:my_chat/page/widget/avatar.dart';
 import 'package:my_chat/page/widget/common_dialog.dart';
-import 'package:my_chat/provider/group_chat_provider.dart';
+import 'package:my_chat/provider/friend_provider.dart';
 import 'package:my_chat/utils/color_tools.dart';
 import 'package:my_chat/utils/commons.dart';
 import 'package:provider/provider.dart';
@@ -26,7 +26,7 @@ class _GroupChatSettingState extends State<GroupChatSetting> {
     // TODO: implement initState
     super.initState();
     groupMemberList =
-        Provider.of<GroupChat>(context, listen: false).groupMemberList;
+        Provider.of<Friend>(context, listen: false).groupMemberList;
   }
 
   @override
@@ -188,7 +188,7 @@ class _GroupChatSettingState extends State<GroupChatSetting> {
           subtitle: "删除并推出后，将不再接受此群聊的信息",
           sure: "确定",
           clickCallback: () {
-            Provider.of<GroupChat>(context, listen: false)
+            Provider.of<Friend>(context, listen: false)
                 .quitGroup(widget.groupID, context);
           },
         );

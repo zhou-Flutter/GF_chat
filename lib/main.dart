@@ -13,8 +13,9 @@ import 'package:my_chat/config/routes/routes.dart';
 import 'package:my_chat/config/style/app_theme.dart';
 import 'package:my_chat/provider/chat_provider.dart';
 import 'package:my_chat/provider/common_provider.dart';
-import 'package:my_chat/provider/group_chat_provider.dart';
-import 'package:my_chat/provider/init_im_sdk_provider.dart';
+import 'package:my_chat/provider/friend_provider.dart';
+import 'package:my_chat/provider/init_provider.dart';
+import 'package:my_chat/provider/login_provider.dart';
 import 'package:my_chat/provider/trtc_provider.dart';
 import 'package:my_chat/utils/commons.dart';
 import 'package:my_chat/utils/locator.dart';
@@ -87,7 +88,7 @@ class _MyChatAppState extends State<MyChatApp> with WidgetsBindingObserver {
       builder: () => MultiProvider(
         providers: [
           ChangeNotifierProvider(
-            create: (_) => InitIMSDKProvider(),
+            create: (_) => InitProvider(),
           ),
           ChangeNotifierProvider(
             create: (_) => Chat(),
@@ -99,7 +100,10 @@ class _MyChatAppState extends State<MyChatApp> with WidgetsBindingObserver {
             create: (_) => Trtc(),
           ),
           ChangeNotifierProvider(
-            create: (_) => GroupChat(),
+            create: (_) => Friend(),
+          ),
+          ChangeNotifierProvider(
+            create: (_) => Login(),
           ),
         ],
         child: RefreshConfiguration(
@@ -123,7 +127,7 @@ class _MyChatAppState extends State<MyChatApp> with WidgetsBindingObserver {
             navigatorKey: MyChatApp.navigatorKey,
             builder: (context, widget) {
               //初始化SDK
-              Provider.of<InitIMSDKProvider>(context, listen: false)
+              Provider.of<InitProvider>(context, listen: false)
                   .initSDK(context);
               Provider.of<Trtc>(context, listen: false).float();
 

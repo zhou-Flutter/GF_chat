@@ -6,6 +6,7 @@ import 'package:my_chat/page/contacts/contacts.dart';
 import 'package:my_chat/page/widget/agreement_dialog.dart';
 import 'package:my_chat/page/widget/avatar.dart';
 import 'package:my_chat/provider/chat_provider.dart';
+import 'package:my_chat/provider/friend_provider.dart';
 import 'package:my_chat/utils/color_tools.dart';
 import 'package:my_chat/utils/commons.dart';
 import 'package:provider/provider.dart';
@@ -117,7 +118,7 @@ class _FriendListState extends State<FriendList> {
         CustomTap(
           tapColor: HexColor.fromHex('#f5f5f5'),
           onTap: () {
-            Provider.of<Chat>(context, listen: false)
+            Provider.of<Friend>(context, listen: false)
                 .getFriendsInfo(item.friendInfo.userProfile!.userID, context);
           },
           child: Row(

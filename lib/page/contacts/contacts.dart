@@ -14,6 +14,7 @@ import 'package:my_chat/page/home/component/slider_item.dart';
 import 'package:my_chat/page/widget/avatar.dart';
 import 'package:my_chat/page/widget/popup_menu.dart';
 import 'package:my_chat/provider/chat_provider.dart';
+import 'package:my_chat/provider/friend_provider.dart';
 import 'package:my_chat/utils/color_tools.dart';
 import 'package:my_chat/utils/commons.dart';
 import 'package:my_chat/utils/event_bus.dart';
@@ -58,7 +59,7 @@ class _ContactsState extends State<Contacts> {
   @override
   void initState() {
     super.initState();
-    friendList = Provider.of<Chat>(context, listen: false).friendList;
+    friendList = Provider.of<Friend>(context, listen: false).friendList;
   }
 
   //跳转页面
@@ -72,7 +73,7 @@ class _ContactsState extends State<Contacts> {
         );
         break;
       case 2:
-        Provider.of<Chat>(context, listen: false).getJoinedGroupList(context);
+        Provider.of<Friend>(context, listen: false).getJoinedGroupList(context);
 
         break;
       case 3:
@@ -88,7 +89,8 @@ class _ContactsState extends State<Contacts> {
 
   @override
   Widget build(BuildContext context) {
-    itemList[0]["unread"] = context.watch<Chat>().friendApplicationUnreadCount;
+    itemList[0]["unread"] =
+        context.watch<Friend>().friendApplicationUnreadCount;
     return Scaffold(
       backgroundColor: Colors.white,
       appBar: AppBar(

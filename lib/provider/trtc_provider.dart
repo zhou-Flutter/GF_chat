@@ -11,7 +11,7 @@ import 'package:my_chat/config/routes/application.dart';
 import 'package:my_chat/main.dart';
 import 'package:my_chat/page/floating/floating_window.dart';
 import 'package:my_chat/page/voice_call/voice_call_page.dart';
-import 'package:my_chat/provider/init_im_sdk_provider.dart';
+import 'package:my_chat/provider/init_provider.dart';
 import 'package:my_chat/utils/GenerateTestUserSig.dart';
 import 'package:my_chat/utils/commons.dart';
 import 'package:my_chat/utils/event_bus.dart';

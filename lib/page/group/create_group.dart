@@ -6,6 +6,7 @@ import 'package:my_chat/page/group/component/friend_list_choice.dart';
 import 'package:my_chat/page/widget/agreement_dialog.dart';
 import 'package:my_chat/page/widget/avatar.dart';
 import 'package:my_chat/provider/chat_provider.dart';
+import 'package:my_chat/provider/friend_provider.dart';
 import 'package:my_chat/utils/color_tools.dart';
 import 'package:my_chat/utils/commons.dart';
 import 'package:provider/provider.dart';
@@ -43,7 +44,7 @@ class _CreateGroupState extends State<CreateGroup> with WidgetsBindingObserver {
   void initState() {
     // TODO: implement initState
     super.initState();
-    friendList = Provider.of<Chat>(context, listen: false).friendList;
+    friendList = Provider.of<Friend>(context, listen: false).friendList;
     //初始化 键盘监听
     WidgetsBinding.instance!.addObserver(this);
   }
@@ -64,14 +65,14 @@ class _CreateGroupState extends State<CreateGroup> with WidgetsBindingObserver {
 
   //创建群聊
   create() {
-    Provider.of<Chat>(context, listen: false)
+    Provider.of<Friend>(context, listen: false)
         .createGroup(groupAddFriend, context);
   }
 
   @override
   Widget build(BuildContext context) {
     List<V2TimFriendInfoResult> friendList =
-        Provider.of<Chat>(context, listen: false).searchFriend!;
+        Provider.of<Friend>(context, listen: false).searchFriend!;
     for (int i = 0; i < friendList.length; i++) {
       searchFriendList.add(Friends(friendInfo: friendList[i].friendInfo!));
     }
@@ -224,7 +225,8 @@ class _CreateGroupState extends State<CreateGroup> with WidgetsBindingObserver {
               if (e.isNotEmpty) {
                 V2TimFriendSearchParam value =
                     V2TimFriendSearchParam(keywordList: [e]);
-                Provider.of<Chat>(context, listen: false).searchFriends(value);
+                Provider.of<Friend>(context, listen: false)
+                    .searchFriends(value);
               } else {
                 searchFriendList = [];
               }

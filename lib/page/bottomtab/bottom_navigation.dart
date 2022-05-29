@@ -15,7 +15,9 @@ import 'package:my_chat/page/home/home.dart';
 import 'package:my_chat/page/personal/personal.dart';
 import 'package:my_chat/provider/chat_provider.dart';
 import 'package:my_chat/provider/common_provider.dart';
-import 'package:my_chat/provider/init_im_sdk_provider.dart';
+import 'package:my_chat/provider/friend_provider.dart';
+import 'package:my_chat/provider/init_provider.dart';
+import 'package:my_chat/provider/login_provider.dart';
 import 'package:my_chat/utils/color_tools.dart';
 import 'package:provider/provider.dart';
 
@@ -48,12 +50,12 @@ class BottomNavState extends State<BottomNav>
   void initState() {
     _controller = PageController(initialPage: 0);
 
-    var userId = Provider.of<InitIMSDKProvider>(context, listen: false).selfId;
+    var userId = Provider.of<Login>(context, listen: false).selfId;
     Provider.of<Chat>(context, listen: false).getUnreadCount();
-    Provider.of<Chat>(context, listen: false)
+    Provider.of<Friend>(context, listen: false)
         .getFriendApplicationList(); //获取好友申请列表
-    Provider.of<Chat>(context, listen: false).getFriendList(); //获取好友列表
-    Provider.of<Chat>(context, listen: false).getSelfInfo(userId);
+    Provider.of<Friend>(context, listen: false).getFriendList(); //获取好友列表
+    Provider.of<Friend>(context, listen: false).getSelfInfo(userId);
     Provider.of<Common>(context, listen: false).getSoundPathName();
 
     // var floatingOne = floatingManager
@@ -80,7 +82,7 @@ class BottomNavState extends State<BottomNav>
   Widget build(BuildContext context) {
     int unreadCount = context.watch<Chat>().unreadCount;
     int friendApplicationUnreadCount =
-        context.watch<Chat>().friendApplicationUnreadCount;
+        context.watch<Friend>().friendApplicationUnreadCount;
     butIcon[0]["unRead"] = unreadCount;
     butIcon[1]["unRead"] = friendApplicationUnreadCount;
     _bottomNavBarList = [

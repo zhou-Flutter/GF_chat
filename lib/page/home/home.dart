@@ -17,7 +17,8 @@ import 'package:my_chat/page/home/component/slider_item.dart';
 import 'package:my_chat/page/widget/avatar.dart';
 import 'package:my_chat/page/widget/popup_menu.dart';
 import 'package:my_chat/provider/chat_provider.dart';
-import 'package:my_chat/provider/init_im_sdk_provider.dart';
+import 'package:my_chat/provider/friend_provider.dart';
+import 'package:my_chat/provider/init_provider.dart';
 import 'package:my_chat/utils/color_tools.dart';
 import 'package:my_chat/utils/relative_date_format.dart';
 import 'package:provider/provider.dart';
@@ -54,7 +55,7 @@ class _HomeState extends State<Home> {
     super.initState();
 
     Provider.of<Chat>(context, listen: false).getConversationList();
-    selfInfo = Provider.of<Chat>(context, listen: false).selfInfo;
+    selfInfo = Provider.of<Friend>(context, listen: false).selfInfo;
   }
 
   _onRefresh() {

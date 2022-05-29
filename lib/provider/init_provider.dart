@@ -15,6 +15,7 @@ import 'package:my_chat/model/tencent_api_resp.dart';
 import 'package:my_chat/page/communal/communal.dart';
 import 'package:my_chat/page/floating/floating_window.dart';
 import 'package:my_chat/provider/chat_provider.dart';
+import 'package:my_chat/provider/friend_provider.dart';
 import 'package:my_chat/provider/trtc_provider.dart';
 import 'package:my_chat/utils/generate_test_user_sig.dart';
 import 'package:my_chat/utils/locator.dart';
@@ -41,15 +42,7 @@ import 'package:tencent_im_sdk_plugin/models/v2_tim_value_callback.dart';
 import 'package:tencent_im_sdk_plugin/tencent_im_sdk_plugin.dart';
 import 'package:tencent_kit/tencent_kit.dart';
 
-class InitIMSDKProvider with ChangeNotifier {
-  final String _TENCENT_APPID = '102005320'; //腾讯QQ APPID
-  LoginResp? _loginResp; //qq登录信息
-  String _userId = ""; //用户ID
-  TencentUserInfoResp? userInfo; //腾讯 QQ 用户信息
-
-  String get selfId => _userId;
-  late Floating floatingOne;
-
+class InitProvider with ChangeNotifier {
   //初始化IM SDK
   initSDK(context) async {
     V2TIMManager timManager = TencentImSDKPlugin.v2TIMManager;
@@ -70,7 +63,8 @@ class InitIMSDKProvider with ChangeNotifier {
             print("挤下线");
           },
           onSelfInfoUpdated: (info) {
-            Provider.of<Chat>(context, listen: false).getSelfInfo(_userId);
+            //后面完善用户信息的时候在操作
+            // Provider.of<Chat>(context, listen: false).getSelfInfo(_userId);
           },
           onUserSigExpired: () {},
         ));
@@ -143,18 +137,18 @@ class InitIMSDKProvider with ChangeNotifier {
     await timManager.getFriendshipManager().setFriendListener(
           listener: V2TimFriendshipListener(
             onFriendListAdded: (List<V2TimFriendInfo> e) {
-              Provider.of<Chat>(context, listen: false).getFriendList();
+              Provider.of<Friend>(context, listen: false).getFriendList();
 
-              Provider.of<Chat>(context, listen: false)
+              Provider.of<Friend>(context, listen: false)
                   .getFriendApplicationList();
             },
             onFriendApplicationListAdded: (List<V2TimFriendApplication> e) {
-              Provider.of<Chat>(context, listen: false)
+              Provider.of<Friend>(context, listen: false)
                   .getFriendApplicationList();
             },
             onFriendApplicationListDeleted: (e) {
               print("拒绝好友验证");
-              Provider.of<Chat>(context, listen: false)
+              Provider.of<Friend>(context, listen: false)
                   .getFriendApplicationList();
             },
           ),
@@ -168,132 +162,4 @@ class InitIMSDKProvider with ChangeNotifier {
       ),
     );
   }
-
-  //登录
-  tologin(context) async {
-    print(_userId);
-    if (_userId == "") {
-      Application.router.navigateTo(
-        context,
-        "/loginPage",
-        clearStack: true,
-        transition: TransitionType.inFromRight,
-      );
-    } else {
-      GenerateTestUserIMSig usersig = GenerateTestUserIMSig(
-        sdkappid: 1400559934,
-        key: "a3e290c6599c803789611039131f2283508f2707c8da745934459f123c6b9817",
-      );
-
-      String pwdStr = usersig.genSig(identifier: _userId, expire: 86400);
-      V2TimCallback data = await TencentImSDKPlugin.v2TIMManager.login(
-        userID: _userId,
-        userSig: pwdStr,
-      );
-
-      if (data.code != 0) {
-        Fluttertoast.showToast(msg: "登录信息失效，请重新登录");
-        Application.router.navigateTo(
-          context,
-          "/loginPage",
-          clearStack: true,
-          transition: TransitionType.inFromRight,
-        );
-        return;
-      } else {
-        setUserInfo(context);
-        EasyLoading.dismiss();
-        //登录成功
-        Application.router.navigateTo(
-          context,
-          "/bottomNav",
-          clearStack: true,
-          transition: TransitionType.inFromRight,
-        );
-      }
-    }
-  }
-
-  /*
-
-     以下是qq登录的逻辑
-
-   */
-  //qq监听
-  listenLogin(BaseResp resp, context) {
-    if (resp is LoginResp) {
-      _loginResp = resp;
-      final String content = 'login: ${resp.openid} - ${resp.accessToken}';
-      _userId = resp.openid!;
-      saveUserId();
-      getUserInfo(context);
-    } else if (resp is ShareMsgResp) {
-      final String content = 'share: ${resp.ret} - ${resp.msg}';
-      Fluttertoast.showToast(msg: "分享监听中");
-    }
-  }
-
-  //QQ 登录
-  qqLogin() async {
-    EasyLoading.show(status: '正在登录...');
-    bool isqq = await Tencent.instance.isQQInstalled();
-    if (isqq) {
-      Tencent.instance.login(scope: <String>[TencentScope.GET_SIMPLE_USERINFO]);
-    } else {
-      Fluttertoast.showToast(msg: "未安装QQ");
-    }
-  }
-
-  //获取用户信息
-  getUserInfo(context) async {
-    if ((_loginResp?.isSuccessful ?? false) &&
-        !(_loginResp!.isExpired ?? true)) {
-      userInfo = await Tencent.instance.getUserInfo(
-        appId: _TENCENT_APPID,
-        openid: _loginResp!.openid!,
-        accessToken: _loginResp!.accessToken!,
-      );
-      if (userInfo!.isSuccessful) {
-        tologin(context);
-      } else {
-        Fluttertoast.showToast(msg: "${userInfo!.msg}");
-      }
-    }
-  }
-
-  setUserInfo(context) async {
-    if (userInfo != null) {
-      Provider.of<Chat>(context, listen: false).setSelfInfo(userInfo!);
-    }
-  }
-
-  // 获取 userId
-  saveUserId() async {
-    SharedPreferences prefs = await SharedPreferences.getInstance();
-    prefs.setString("userId", _userId);
-  }
-
-  // 获取 userId  进行登录
-  getUserID(context) async {
-    SharedPreferences prefs = await SharedPreferences.getInstance();
-    if (prefs.getString("userId") != null) {
-      _userId = prefs.getString("userId")!;
-      tologin(context);
-    } else {
-      Application.router.navigateTo(
-        context,
-        "/loginPage",
-        clearStack: true,
-        transition: TransitionType.inFromRight,
-      );
-    }
-  }
-
-  /*
-
-     以下是微信登录的逻辑
-
-  */
-  //由于XX的原因，暂无法使用微信登录
-
 }

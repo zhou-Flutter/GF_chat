@@ -3,7 +3,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:my_chat/config/routes/application.dart';
 import 'package:my_chat/provider/chat_provider.dart';
-import 'package:my_chat/provider/init_im_sdk_provider.dart';
+import 'package:my_chat/provider/friend_provider.dart';
+import 'package:my_chat/provider/init_provider.dart';
 import 'package:my_chat/utils/color_tools.dart';
 import 'package:my_chat/utils/commons.dart';
 import 'package:provider/provider.dart';
@@ -49,7 +50,7 @@ class _PersonalState extends State<Personal> {
   @override
   void initState() {
     super.initState();
-    selfInfo = Provider.of<Chat>(context, listen: false).selfInfo;
+    selfInfo = Provider.of<Friend>(context, listen: false).selfInfo;
   }
 
   @override

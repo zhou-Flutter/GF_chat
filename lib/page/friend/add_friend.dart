@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:my_chat/config/routes/application.dart';
 import 'package:my_chat/provider/chat_provider.dart';
+import 'package:my_chat/provider/friend_provider.dart';
 import 'package:my_chat/utils/color_tools.dart';
 import 'package:my_chat/utils/constant.dart';
 import 'package:provider/provider.dart';
@@ -78,7 +79,7 @@ class _AddFriendPageState extends State<AddFriendPage>
 
   //搜索是否有好友 如果有则跳转到加好友页面
   searchFriend() async {
-    Provider.of<Chat>(context, listen: false)
+    Provider.of<Friend>(context, listen: false)
         .getFriendsInfo(inputValue, context);
     textEditingController.clear();
     inputValue = "";

@@ -36,7 +36,9 @@ class BottomNavState extends State<BottomNav>
     // Communal(),
     Personal(),
   ];
+
   int _currentIndex = 0;
+
   List<BottomNavigationBarItem> _bottomNavBarList = [];
 
   List butIcon = [
@@ -50,12 +52,11 @@ class BottomNavState extends State<BottomNav>
   void initState() {
     _controller = PageController(initialPage: 0);
 
-    var userId = Provider.of<Login>(context, listen: false).selfId;
     Provider.of<Chat>(context, listen: false).getUnreadCount();
     Provider.of<Friend>(context, listen: false)
         .getFriendApplicationList(); //获取好友申请列表
     Provider.of<Friend>(context, listen: false).getFriendList(); //获取好友列表
-    Provider.of<Friend>(context, listen: false).getSelfInfo(userId);
+    Provider.of<Friend>(context, listen: false).getSelfInfo();
     Provider.of<Common>(context, listen: false).getSoundPathName();
 
     // var floatingOne = floatingManager

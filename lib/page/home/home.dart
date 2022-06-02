@@ -46,16 +46,14 @@ class _HomeState extends State<Home> {
   final RefreshController _refreshController =
       RefreshController(initialRefresh: false);
 
-  List<V2TimConversation> currentMessageList = [];
-
-  List<V2TimUserFullInfo> selfInfo = [];
+  List<V2TimConversation> currentMessageList = []; //会话列表
 
   @override
   void initState() {
     super.initState();
 
     Provider.of<Chat>(context, listen: false).getConversationList();
-    selfInfo = Provider.of<Friend>(context, listen: false).selfInfo;
+    // selfInfo = Provider.of<Friend>(context, listen: false).selfInfo;
   }
 
   _onRefresh() {

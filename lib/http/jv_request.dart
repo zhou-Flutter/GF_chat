@@ -26,19 +26,23 @@ class JvRequest {
     loading = false,
   }) async {
     getInstance();
-
+    var content =
+        utf8.encode("e3cc74a5b17b41296a2f9b6d:d13871b266006854d414defe");
+    var digest = base64Encode(content);
     Map<String, dynamic>? headers = {
-      'content-type': 'application/json',
-      '683e39a84c5223571f27216e': 'a31624a988aee78ec1defa30',
+      'Content-Type': 'application/json',
+      'Authorization': digest,
     };
 
     try {
       EasyLoading.show(status: '加载中...');
 
-      Response response = await _dio!.request(path,
-          data: data,
-          queryParameters: params,
-          options: Options(method: method, headers: headers));
+      Response response = await _dio!.request(
+        path,
+        // data: data,
+        // queryParameters: params,
+        // options: Options(method: method, headers: headers),
+      );
 
       if (response.statusCode == 200 || response.statusCode == 201) {
         try {

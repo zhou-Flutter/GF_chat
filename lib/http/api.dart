@@ -7,6 +7,6 @@ class Api {
   }
 
   static GetNumber(data) {
-    return Request.post("/getNumber", data: data);
+    return Request.post("/v1/web/loginTokenVerify", data: data);
   }
 }

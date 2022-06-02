@@ -30,17 +30,13 @@ class SelfQr extends StatefulWidget {
 class _SelfQrState extends State<SelfQr> {
   GlobalKey repaintKey = GlobalKey();
 
-  List<V2TimUserFullInfo> selfInfo = [];
-  V2TimUserFullInfo? info;
+  V2TimUserFullInfo? selfInfo;
+
   @override
   void initState() {
     // TODO: implement initState
     super.initState();
     selfInfo = Provider.of<Friend>(context, listen: false).selfInfo;
-    if (selfInfo.isNotEmpty) {
-      info = selfInfo[0];
-      setState(() {});
-    }
   }
 
   @override
@@ -66,7 +62,7 @@ class _SelfQrState extends State<SelfQr> {
                 key: repaintKey,
                 child: Container(
                   child: QrImage(
-                    data: '${info!.userID}',
+                    data: '${selfInfo!.userID}',
                     version: QrVersions.auto,
                     size: 400.r,
                     gapless: false,

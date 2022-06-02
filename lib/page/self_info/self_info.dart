@@ -19,17 +19,12 @@ class SelfInfoPage extends StatefulWidget {
 }
 
 class _SelfInfoPageState extends State<SelfInfoPage> {
-  List<V2TimUserFullInfo> selfInfo = [];
-  V2TimUserFullInfo? info;
+  V2TimUserFullInfo? selfInfo;
 
   @override
   void initState() {
     super.initState();
     selfInfo = Provider.of<Friend>(context, listen: false).selfInfo;
-    if (selfInfo.isNotEmpty) {
-      info = selfInfo[0];
-      setState(() {});
-    }
   }
 
   @override
@@ -101,7 +96,7 @@ class _SelfInfoPageState extends State<SelfInfoPage> {
                     ),
                     const Spacer(),
                     Text(
-                      "${info!.nickName}",
+                      "${selfInfo!.nickName}",
                       style: TextStyle(
                         color: Colors.black45,
                         fontSize: 30.sp,
@@ -127,7 +122,7 @@ class _SelfInfoPageState extends State<SelfInfoPage> {
                     ),
                     const Spacer(),
                     Text(
-                      "${info!.userID}",
+                      "${selfInfo!.userID}",
                       overflow: TextOverflow.ellipsis,
                       style: TextStyle(
                         color: Colors.black45,

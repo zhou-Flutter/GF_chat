@@ -9,35 +9,52 @@ import 'package:my_chat/provider/chat_provider.dart';
 import 'package:my_chat/provider/friend_provider.dart';
 import 'package:my_chat/utils/commons.dart';
 import 'package:my_chat/utils/constant.dart';
+import 'package:my_chat/utils/event_bus.dart';
 import 'package:provider/provider.dart';
+import 'package:tencent_im_sdk_plugin/models/v2_tim_friend_info.dart';
 import 'package:tencent_im_sdk_plugin/models/v2_tim_friend_info_result.dart';
 import 'package:tencent_im_sdk_plugin/models/v2_tim_user_full_info.dart';
 
 class FriendInfoPage extends StatefulWidget {
-  FriendInfoPage({Key? key}) : super(key: key);
+  String? userID;
+  FriendInfoPage({
+    Key? key,
+    this.userID,
+  }) : super(key: key);
 
   @override
   State<FriendInfoPage> createState() => _FriendInfoPageState();
 }
 
 class _FriendInfoPageState extends State<FriendInfoPage> {
-  var userID;
   var showName = "";
   V2TimFriendInfoResult? _friendInfo;
 
   @override
   void initState() {
     super.initState();
-    if (Provider.of<Friend>(context, listen: false).friendInfo.isNotEmpty) {
-      _friendInfo = Provider.of<Friend>(context, listen: false).friendInfo[0];
-      userID = _friendInfo!.friendInfo!.userProfile!.userID;
-      if (_friendInfo!.friendInfo!.friendRemark == "") {
+    //修改备注 刷新
+    eventBus.on<NoticeEvent>().listen((event) {
+      if (mounted) {
+        if (event.notice == Notice.remark) {
+          getUserInfo();
+        }
+      }
+    });
+    getUserInfo();
+  }
+
+  //获取好友信息
+  getUserInfo() async {
+    _friendInfo = await Friend.getFriendsInfo(widget.userID);
+    if (_friendInfo != null) {
+      if (_friendInfo!.friendInfo!.friendRemark!.length == 0) {
         showName = _friendInfo!.friendInfo!.userProfile!.nickName!;
       } else {
         showName = _friendInfo!.friendInfo!.friendRemark!;
       }
-      setState(() {});
     }
+    setState(() {});
   }
 
   @override
@@ -107,16 +124,29 @@ class _FriendInfoPageState extends State<FriendInfoPage> {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Container(
-                  padding: EdgeInsets.only(bottom: 15.r),
+                  padding: EdgeInsets.only(bottom: 10.r),
                   child: Text(
-                    showName,
+                    "${showName}",
                     overflow: TextOverflow.ellipsis,
                     style: TextStyle(
-                      fontSize: 50.sp,
+                      fontSize: 35.sp,
                       fontWeight: FontWeight.w600,
                     ),
                   ),
                 ),
+                info.friendInfo!.friendRemark!.length == 0
+                    ? Container()
+                    : Container(
+                        padding: EdgeInsets.only(bottom: 5.r),
+                        child: Text(
+                          "昵称:${info.friendInfo!.userProfile!.nickName}",
+                          overflow: TextOverflow.ellipsis,
+                          style: TextStyle(
+                            color: Colors.black38,
+                            fontSize: 28.sp,
+                          ),
+                        ),
+                      ),
                 Container(
                   padding: EdgeInsets.only(bottom: 5.r),
                   child: Text(
@@ -161,7 +191,7 @@ class _FriendInfoPageState extends State<FriendInfoPage> {
                 transition: TransitionType.inFromRight,
                 routeSettings: RouteSettings(
                   arguments: {
-                    "userID": userID,
+                    "userID": widget.userID,
                   },
                 ),
               );
@@ -198,7 +228,7 @@ class _FriendInfoPageState extends State<FriendInfoPage> {
           InkWell(
             onTap: () {
               Provider.of<Chat>(context, listen: false)
-                  .getC2CMsgList(userID, showName, context);
+                  .getC2CMsgList(widget.userID, context);
             },
             child: Container(
               padding: EdgeInsets.all(20.r),

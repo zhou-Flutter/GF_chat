@@ -1,3 +1,4 @@
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:my_chat/provider/chat_provider.dart';
@@ -16,19 +17,15 @@ class Permission extends StatefulWidget {
 
 class _PermissionState extends State<Permission> {
   bool flag = false;
-  List<V2TimUserFullInfo> selfInfo = [];
-
-  V2TimUserFullInfo? info;
+  V2TimUserFullInfo? selfInfo;
 
   @override
   void initState() {
-    // TODO: implement initState
     super.initState();
+
     selfInfo = Provider.of<Friend>(context, listen: false).selfInfo;
-    if (selfInfo.isNotEmpty) {
-      info = selfInfo[0];
-      print(info!.allowType);
-      if (info!.allowType == AllowType.V2TIM_FRIEND_NEED_CONFIRM) {
+    if (selfInfo != null) {
+      if (selfInfo!.allowType == AllowType.V2TIM_FRIEND_NEED_CONFIRM) {
         flag = true;
       }
       setState(() {});
@@ -56,13 +53,17 @@ class _PermissionState extends State<Permission> {
                     style: TextStyle(fontSize: 30.sp),
                   ),
                   const Spacer(),
-                  Switch(
-                    value: flag,
-                    onChanged: (value) {
-                      setState(() {
-                        flag = value;
-                      });
-                    },
+                  Transform.scale(
+                    scale: 0.75,
+                    child: CupertinoSwitch(
+                      value: flag,
+                      trackColor: Colors.black26,
+                      onChanged: (value) {
+                        setState(() {
+                          flag = value;
+                        });
+                      },
+                    ),
                   ),
                 ],
               ),

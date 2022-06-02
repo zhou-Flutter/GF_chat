@@ -28,8 +28,12 @@ class _GroupListState extends State<GroupList> {
   @override
   void initState() {
     super.initState();
-    joinedGroupList =
-        Provider.of<Friend>(context, listen: false).joinedGroupList;
+    getGroupList();
+  }
+
+  getGroupList() async {
+    joinedGroupList = await Friend.getJoinedGroupList() as List<V2TimGroupInfo>;
+    setState(() {});
   }
 
   @override

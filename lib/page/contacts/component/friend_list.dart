@@ -1,6 +1,8 @@
+import 'package:fluro/fluro.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:lpinyin/lpinyin.dart';
+import 'package:my_chat/config/routes/application.dart';
 import 'package:my_chat/model/friends.dart';
 import 'package:my_chat/page/contacts/contacts.dart';
 import 'package:my_chat/page/widget/agreement_dialog.dart';
@@ -29,23 +31,25 @@ class _FriendListState extends State<FriendList> {
 
   List<Friends> friends = [];
 
-  @override
-  void initState() {
-    super.initState();
+  // 初始化加载好友信息
+  initFriendInfo() {
+    friends = [];
     friendList = widget.friendList;
     for (int i = 0; i < friendList.length; i++) {
-      if (friendList[i].friendRemark == "") {
+      if (friendList[i].friendRemark!.length == 0) {
         //根据userName 排序
         String name = friendList[i].userProfile!.nickName!;
         var nameFirst = PinyinHelper.getFirstWordPinyin(name);
         bool isABC = RegExp(r'[a-zA-Z]+').hasMatch(nameFirst);
         if (isABC) {
           //转大写
-          var cap = nameFirst.toUpperCase();
-          friends.add(Friends(friendInfo: friendList[i], indexLetter: cap));
+          var cap = nameFirst.toUpperCase().substring(0, 1);
+          friends.add(Friends(
+              showName: name, friendInfo: friendList[i], indexLetter: cap));
         } else {
           //转 #
-          friends.add(Friends(friendInfo: friendList[i], indexLetter: "#"));
+          friends.add(Friends(
+              showName: name, friendInfo: friendList[i], indexLetter: "#"));
         }
       } else {
         //friendRemark 排序
@@ -54,11 +58,13 @@ class _FriendListState extends State<FriendList> {
         bool isABC = RegExp(r'[a-zA-Z]+').hasMatch(nameFirst);
         if (isABC) {
           //转大写
-          var cap = nameFirst.toUpperCase();
-          friends.add(Friends(friendInfo: friendList[i], indexLetter: cap));
+          var cap = nameFirst.toUpperCase().substring(0, 1);
+          friends.add(Friends(
+              showName: name, friendInfo: friendList[i], indexLetter: cap));
         } else {
           //转 #
-          friends.add(Friends(friendInfo: friendList[i], indexLetter: "#"));
+          friends.add(Friends(
+              showName: name, friendInfo: friendList[i], indexLetter: "#"));
         }
       }
     }
@@ -76,6 +82,7 @@ class _FriendListState extends State<FriendList> {
 
   @override
   Widget build(BuildContext context) {
+    initFriendInfo();
     return ScrollConfiguration(
       behavior: CusBehavior(),
       child: ListView.builder(
@@ -118,8 +125,18 @@ class _FriendListState extends State<FriendList> {
         CustomTap(
           tapColor: HexColor.fromHex('#f5f5f5'),
           onTap: () {
-            Provider.of<Friend>(context, listen: false)
-                .getFriendsInfo(item.friendInfo.userProfile!.userID, context);
+            Application.router.navigateTo(
+              context,
+              "/friendInfoPage",
+              transition: TransitionType.inFromRight,
+              routeSettings: RouteSettings(
+                arguments: {
+                  "userID": item.friendInfo.userProfile!.userID,
+                },
+              ),
+            );
+            // Provider.of<Friend>(context, listen: false)
+            //     .getFriendsInfo(item.friendInfo.userProfile!.userID, context);
           },
           child: Row(
             crossAxisAlignment: CrossAxisAlignment.center,
@@ -135,7 +152,7 @@ class _FriendListState extends State<FriendList> {
               Container(
                 padding: EdgeInsets.only(left: 10.r),
                 child: Text(
-                  "${item.friendInfo.userProfile!.nickName}",
+                  "${item.showName}",
                   style: TextStyle(fontSize: 30.sp),
                 ),
               )

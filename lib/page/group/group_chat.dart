@@ -21,15 +21,15 @@ import 'package:my_chat/utils/event_bus.dart';
 import 'package:my_chat/utils/relative_date_format.dart';
 import 'package:provider/provider.dart';
 import 'package:tencent_im_sdk_plugin/enum/message_elem_type.dart';
+import 'package:tencent_im_sdk_plugin/models/v2_tim_conversation.dart';
 import 'package:tencent_im_sdk_plugin/models/v2_tim_message.dart';
 
 class GroupChatPage extends StatefulWidget {
   String? groupID;
-  String? showName;
+
   GroupChatPage({
     Key? key,
     this.groupID,
-    this.showName,
   }) : super(key: key);
 
   @override
@@ -46,6 +46,8 @@ class _GroupChatPageState extends State<GroupChatPage> {
   AudioPlayer audioPlayer = AudioPlayer(); //语音播放
 
   var groupID; //群ID
+
+  V2TimConversation conversation = new V2TimConversation(conversationID: '');
 
   @override
   void initState() {
@@ -65,6 +67,13 @@ class _GroupChatPageState extends State<GroupChatPage> {
         _controller.finishLoad(success: true, noMore: false);
       }
     });
+
+    getconversationInfo();
+  }
+
+  // 获取单个会话
+  getconversationInfo() async {
+    conversation = (await Chat.getConversationInfo(true, widget.groupID))!;
     setState(() {});
   }
 
@@ -91,7 +100,7 @@ class _GroupChatPageState extends State<GroupChatPage> {
         leading: backBtn(context),
         centerTitle: true,
         title: Text(
-          widget.showName == " " ? "群聊" : "${widget.showName}",
+          conversation.showName == " " ? "群聊" : "${conversation.showName}",
           style: TextStyle(fontSize: 35.sp),
         ),
         actions: <Widget>[
@@ -158,7 +167,8 @@ class _GroupChatPageState extends State<GroupChatPage> {
               ),
               SafeArea(
                 child: Container(
-                  child: ButtonInputBox(converID: groupID, isGroup: true),
+                  child:
+                      ButtonInputBox(converID: widget.groupID!, isGroup: true),
                 ),
               )
             ],

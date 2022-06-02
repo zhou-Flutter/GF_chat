@@ -104,6 +104,7 @@ class Login with ChangeNotifier {
       _loginResp = resp;
       final String content = 'login: ${resp.openid} - ${resp.accessToken}';
       _userId = resp.openid!;
+      Constant.userId = _userId;
       saveUserId();
       getUserInfo(context);
     } else if (resp is ShareMsgResp) {
@@ -157,6 +158,7 @@ class Login with ChangeNotifier {
     SharedPreferences prefs = await SharedPreferences.getInstance();
     if (prefs.getString("userId") != null) {
       _userId = prefs.getString("userId")!;
+      Constant.userId = _userId;
       tologin(context);
     } else {
       Application.router.navigateTo(
@@ -180,7 +182,7 @@ class Login with ChangeNotifier {
       print("receive sdk setup call back event :${event.toMap()}");
     });
     jverify.setup(
-        appKey: "d0443639315b0672ff9e161b",
+        appKey: "e3cc74a5b17b41296a2f9b6d",
         channel: "devloper-default"); // 初始化sdk,  appKey 和 channel 只对ios设置有效
     jverify.setDebugMode(true);
 
@@ -221,16 +223,17 @@ class Login with ChangeNotifier {
 
   //获取手机号
   getMobileNumber(token) async {
-    Map data = {"token": token};
-    // await Api.GetNumber(data).then((e) {
+    Map data = {"loginToken": token, "exID": "1234566"};
+    // Api.GetNumber(data).then((e) {
     //   print(e);
-    //   _isVerify = true;
-    //   notifyListeners();
+    //   // _isVerify = true;
+    //   // notifyListeners();
     // }).catchError((e) {
     //   print("获取失败");
     // });
 
-    await JvRequest.request(Constant.jVerifyUrl, data: data).then((value) {
+    await JvRequest.request(Constant.jVerifyUrl, method: "POST", data: data)
+        .then((value) {
       print(value);
     }).catchError((e) {
       print(e);

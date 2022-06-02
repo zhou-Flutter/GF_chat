@@ -2,6 +2,7 @@ import 'package:fluttertoast/fluttertoast.dart';
 
 class ErrorTips {
   static Map work = {
+    6017: "参数无效，请检查参数是否符合要求",
     7005: "文件大小超出了限制，如果上传文件，最大限制是100MB",
     7013: "套餐包不支持该接口的使用，请升级到旗舰版套餐",
     7014: "非法请求",

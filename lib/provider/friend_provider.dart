@@ -5,6 +5,9 @@ import 'package:fluttertoast/fluttertoast.dart';
 import 'package:my_chat/config/routes/application.dart';
 import 'package:my_chat/model/tencent_api_resp.dart';
 import 'package:my_chat/provider/chat_provider.dart';
+import 'package:my_chat/provider/login_provider.dart';
+import 'package:my_chat/utils/commons.dart';
+import 'package:my_chat/utils/constant.dart';
 import 'package:my_chat/utils/error_tips.dart';
 import 'package:my_chat/utils/event_bus.dart';
 import 'package:provider/provider.dart';
@@ -25,6 +28,7 @@ import 'package:tencent_im_sdk_plugin/models/v2_tim_friend_info_result.dart';
 import 'package:tencent_im_sdk_plugin/models/v2_tim_friend_operation_result.dart';
 import 'package:tencent_im_sdk_plugin/models/v2_tim_friend_search_param.dart';
 import 'package:tencent_im_sdk_plugin/models/v2_tim_group_info.dart';
+import 'package:tencent_im_sdk_plugin/models/v2_tim_group_info_result.dart';
 import 'package:tencent_im_sdk_plugin/models/v2_tim_group_member.dart';
 import 'package:tencent_im_sdk_plugin/models/v2_tim_group_member_full_info.dart';
 import 'package:tencent_im_sdk_plugin/models/v2_tim_group_member_info_result.dart';
@@ -38,8 +42,8 @@ class Friend with ChangeNotifier {
   bool ischatPage = false;
   List<V2TimFriendInfo> _friendList = []; //好友列表
   List<V2TimUserFullInfo> _usersInfo = []; //用户信息
-  List<V2TimUserFullInfo> _selfInfo = []; //自己的信息
-  List<V2TimFriendInfoResult> _friendInfo = []; //指定好友的信息
+  V2TimUserFullInfo? _selfInfo; //自己的信息
+  V2TimFriendInfoResult? _friendInfo; //指定好友的信息
   List<V2TimFriendInfo> _blackList = []; //黑名单
   int _friendApplicationUnreadCount = 0; //申请好友未读数
   List<V2TimFriendApplication?>? _applicationList = []; //申请列表
@@ -51,8 +55,8 @@ class Friend with ChangeNotifier {
   List<V2TimGroupMemberFullInfo?> get groupMemberList => _groupMemberList;
   List<V2TimFriendInfo> get friendList => _friendList;
   List<V2TimUserFullInfo> get usersInfo => _usersInfo;
-  List<V2TimUserFullInfo> get selfInfo => _selfInfo;
-  List<V2TimFriendInfoResult> get friendInfo => _friendInfo;
+  V2TimUserFullInfo? get selfInfo => _selfInfo;
+  V2TimFriendInfoResult? get friendInfo => _friendInfo;
   List<V2TimFriendInfo> get blackList => _blackList;
   int get friendApplicationUnreadCount => _friendApplicationUnreadCount;
   List<V2TimFriendApplication?>? get applicationList => _applicationList;
@@ -101,26 +105,17 @@ class Friend with ChangeNotifier {
   }
 
   //查询好友信息
-  getFriendsInfo(userIDList, context) async {
-    _friendInfo = [];
+  static Future<V2TimFriendInfoResult?> getFriendsInfo(userIDList) async {
     V2TimValueCallback<List<V2TimFriendInfoResult>> res =
         await TencentImSDKPlugin.v2TIMManager
             .getFriendshipManager()
             .getFriendsInfo(userIDList: [userIDList]);
     print(res.data!.length);
-    if (res.data != null) {
-      _friendInfo = res.data!;
-      print("查询到好友");
-
-      notifyListeners();
+    if (res.code == 0) {
+      return res.data![0];
     } else {
-      _friendInfo = [];
+      print("查询失败");
     }
-    Application.router.navigateTo(
-      context,
-      "/friendInfoPage",
-      transition: TransitionType.inFromRight,
-    );
   }
 
   //添加好友
@@ -176,27 +171,24 @@ class Friend with ChangeNotifier {
   }
 
   //查询自己的信息
-  getSelfInfo(selfInfoID) async {
+  getSelfInfo() async {
     V2TimValueCallback<List<V2TimUserFullInfo>> res = await TencentImSDKPlugin
         .v2TIMManager
-        .getUsersInfo(userIDList: [selfInfoID]);
-    if (res.data != null) {
-      _selfInfo = res.data!;
+        .getUsersInfo(userIDList: [Constant.userId]);
+    if (res.code == 0) {
+      _selfInfo = res.data![0];
       notifyListeners();
-    } else {
-      _selfInfo = [];
-    }
+    } else {}
   }
 
   //获取黑名单
-  getBlackList() async {
+  static Future<List<V2TimFriendInfo>?> getBlackList() async {
     V2TimValueCallback<List<V2TimFriendInfo>> res = await TencentImSDKPlugin
         .v2TIMManager
         .getFriendshipManager()
         .getBlackList();
-    if (res.data != null) {
-      _blackList = res.data!;
-      notifyListeners();
+    if (res.code == 0) {
+      return res.data!;
     }
   }
 
@@ -266,10 +258,16 @@ class Friend with ChangeNotifier {
   }
 
   //修改好友信息 备注等信息
-  setFriendInfo(userID, friendRemark) async {
-    await TencentImSDKPlugin.v2TIMManager
+  setFriendInfo(userID, friendRemark, context) async {
+    V2TimCallback res = await TencentImSDKPlugin.v2TIMManager
         .getFriendshipManager()
         .setFriendInfo(userID: userID, friendRemark: friendRemark);
+    if (res.code == 0) {
+      getFriendList();
+      Provider.of<Chat>(context, listen: false).getConversationList();
+      eventBus.fire(NoticeEvent(Notice.remark));
+      Application.router.pop(context);
+    }
   }
 
   //搜索好友
@@ -331,18 +329,13 @@ class Friend with ChangeNotifier {
   }
 
   //获取加入的群聊
-  getJoinedGroupList(context) async {
+  static Future<List<V2TimGroupInfo>?> getJoinedGroupList() async {
     V2TimValueCallback<List<V2TimGroupInfo>> res = await TencentImSDKPlugin
         .v2TIMManager
         .getGroupManager()
         .getJoinedGroupList();
     if (res.code == 0) {
-      _joinedGroupList = res.data!;
-      Application.router.navigateTo(
-        context,
-        "/groupList",
-        transition: TransitionType.inFromRight,
-      );
+      return res.data!;
     } else {
       print('获取失败');
     }
@@ -375,6 +368,20 @@ class Friend with ChangeNotifier {
     }
   }
 
+  ///获取群资料
+  static Future<V2TimGroupInfoResult?> getGroupsInfo(groupIDList) async {
+    V2TimValueCallback<List<V2TimGroupInfoResult>> res =
+        await TencentImSDKPlugin.v2TIMManager
+            .getGroupManager()
+            .getGroupsInfo(groupIDList: [groupIDList]);
+
+    if (res.code == 0) {
+      return res.data![0];
+    } else {
+      ErrorTips.errorMsg(res.code);
+    }
+  }
+
   //推出群聊
   quitGroup(groupID, context) async {
     V2TimCallback res =
@@ -387,7 +394,7 @@ class Friend with ChangeNotifier {
         transition: TransitionType.inFromRight,
       );
     } else {
-      print("推出十八");
+      print("推出失败");
     }
   }
 }

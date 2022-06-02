@@ -23,6 +23,7 @@ late StreamSubscription<bool> keyboardSubscription;
 
 class ButtonInputBox extends StatefulWidget {
   String converID; //对话ID  可以是群聊ID  个可以单聊对话ID
+
   bool isGroup;
   var animatedListKey;
   ButtonInputBox({
@@ -121,25 +122,16 @@ class _ButtonInputBoxState extends State<ButtonInputBox>
 
   //获取草稿箱的类容
   getDraftsText() async {
-    var conversationID = "";
-    if (widget.isGroup) {
-      conversationID = "group_${widget.converID}";
-    } else {
-      conversationID = "c2c_${widget.converID}";
-    }
-
-    V2TimValueCallback<V2TimConversation> res = await TencentImSDKPlugin
-        .v2TIMManager
-        .getConversationManager()
-        .getConversation(conversationID: conversationID);
-    if (res.data != null) {
-      conversation = res.data;
+    conversation =
+        (await Chat.getConversationInfo(widget.isGroup, widget.converID))!;
+    if (conversation != null) {
       if (conversation!.draftText != null) {
         if (conversation!.draftText!.isNotEmpty) {
           textEditingController.text = conversation!.draftText!;
           btnMeuType = BtnMeuType.key;
           SystemChannels.textInput.invokeMethod<void>('TextInput.show');
           FocusScope.of(context).requestFocus(_focusNode);
+          setState(() {});
         }
       }
     }
@@ -165,8 +157,6 @@ class _ButtonInputBoxState extends State<ButtonInputBox>
           btnMeuType = BtnMeuType.key;
           keyboardHight = MediaQuery.of(context).viewInsets.bottom;
           saveKeyboardHight = MediaQuery.of(context).viewInsets.bottom;
-          print("监听");
-          print(MediaQuery.of(context).viewInsets.bottom);
         }
       });
     });

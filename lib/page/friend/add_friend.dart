@@ -79,8 +79,16 @@ class _AddFriendPageState extends State<AddFriendPage>
 
   //搜索是否有好友 如果有则跳转到加好友页面
   searchFriend() async {
-    Provider.of<Friend>(context, listen: false)
-        .getFriendsInfo(inputValue, context);
+    Application.router.navigateTo(
+      context,
+      "/friendInfoPage",
+      transition: TransitionType.inFromRight,
+      routeSettings: RouteSettings(
+        arguments: {
+          "userID": inputValue,
+        },
+      ),
+    );
     textEditingController.clear();
     inputValue = "";
     FocusScope.of(context).unfocus();

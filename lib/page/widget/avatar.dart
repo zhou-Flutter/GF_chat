@@ -19,7 +19,7 @@ class Avatar extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     var faceUrlMe =
-        Provider.of<Friend>(context, listen: false).selfInfo[0].faceUrl;
+        Provider.of<Friend>(context, listen: false).selfInfo!.faceUrl;
     return Container(
       child: isSelf == true
           ? Container(

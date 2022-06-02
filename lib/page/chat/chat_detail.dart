@@ -41,11 +41,10 @@ import 'package:tencent_im_sdk_plugin/tencent_im_sdk_plugin.dart';
 
 class ChatDetailPage extends StatefulWidget {
   String? userID;
-  String? showName;
+
   ChatDetailPage({
     Key? key,
     this.userID,
-    this.showName,
   }) : super(key: key);
 
   @override
@@ -64,12 +63,14 @@ class _ChatDetailPageState extends State<ChatDetailPage> {
 
   var userID;
 
+  V2TimConversation? conversation;
+
   @override
   void initState() {
     super.initState();
 
     userID = widget.userID;
-    // Provider.of<Chat>(context, listen: false).getC2CMsgList(userID);
+
     c2CMsgList = Provider.of<Chat>(context, listen: false).c2CMsgList;
     Provider.of<Chat>(context, listen: false).setConverID(userID);
     Provider.of<Chat>(context, listen: false).chatPage(ChaPage.crc);
@@ -83,6 +84,20 @@ class _ChatDetailPageState extends State<ChatDetailPage> {
         _controller.finishLoad(success: true, noMore: false);
       }
     });
+    //修改备注 刷新
+    eventBus.on<NoticeEvent>().listen((event) {
+      if (mounted) {
+        if (event.notice == Notice.remark) {
+          getconversationInfo();
+        }
+      }
+    });
+    getconversationInfo();
+  }
+
+  // 获取单个会话
+  getconversationInfo() async {
+    conversation = (await Chat.getConversationInfo(false, widget.userID))!;
     setState(() {});
   }
 
@@ -110,7 +125,7 @@ class _ChatDetailPageState extends State<ChatDetailPage> {
         leading: backBtn(context),
         centerTitle: true,
         title: Text(
-          "${widget.showName}",
+          conversation == null ? "" : "${conversation!.showName}",
           style: TextStyle(fontSize: 35.sp),
         ),
         actions: <Widget>[

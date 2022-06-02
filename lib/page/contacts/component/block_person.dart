@@ -1,3 +1,4 @@
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:tencent_im_sdk_plugin/models/v2_tim_friend_info.dart';
@@ -61,15 +62,19 @@ class _BlockPersonState extends State<BlockPerson> {
             style: TextStyle(fontSize: 30.sp),
           ),
           const Spacer(),
-          Switch(
-            value: flag,
-            onChanged: (value) {
-              if (value) {
-                addToBlackList(widget.userID, value);
-              } else {
-                deleteFromBlackList(widget.userID, value);
-              }
-            },
+          Transform.scale(
+            scale: 0.75,
+            child: CupertinoSwitch(
+              value: flag,
+              trackColor: Colors.black26,
+              onChanged: (value) {
+                if (value) {
+                  addToBlackList(widget.userID, value);
+                } else {
+                  deleteFromBlackList(widget.userID, value);
+                }
+              },
+            ),
           ),
         ],
       ),

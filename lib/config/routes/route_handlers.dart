@@ -9,6 +9,7 @@ import 'package:my_chat/page/chat/component/video_play.dart';
 import 'package:my_chat/page/contacts/chat_setting.dart';
 import 'package:my_chat/page/contacts/blacklist.dart';
 import 'package:my_chat/page/contacts/consent_verified.dart';
+import 'package:my_chat/page/contacts/remark.dart';
 import 'package:my_chat/page/friend/add_friend.dart';
 import 'package:my_chat/page/friend/component/search_friend.dart';
 import 'package:my_chat/page/friend/send_add_page.dart';
@@ -22,6 +23,7 @@ import 'package:my_chat/page/group/group_list.dart';
 
 import 'package:my_chat/page/login/login.dart';
 import 'package:my_chat/page/login/mobile_num_login.dart';
+import 'package:my_chat/page/map/bdmap.dart';
 import 'package:my_chat/page/map/map.dart';
 import 'package:my_chat/page/search/search.dart';
 import 'package:my_chat/page/self_info/self_info.dart';
@@ -57,7 +59,6 @@ var chatDetailHandler = Handler(
   final args = context?.settings?.arguments as Map;
   return ChatDetailPage(
     userID: args['userID'],
-    showName: args['showName'],
   );
 });
 
@@ -73,7 +74,10 @@ var searchFriendHandler = Handler(
 
 var friendInfoPageHandler = Handler(
     handlerFunc: (BuildContext? context, Map<String, List<String>> params) {
-  return FriendInfoPage();
+  final args = context?.settings?.arguments as Map;
+  return FriendInfoPage(
+    userID: args['userID'],
+  );
 });
 
 var friendNewPageHandler = Handler(
@@ -169,7 +173,6 @@ var groupChatPageHandler = Handler(
   final args = context?.settings?.arguments as Map;
   return GroupChatPage(
     groupID: args['groupID'],
-    showName: args['showName'],
   );
 });
 
@@ -186,7 +189,10 @@ var searchHandler = Handler(
   return Search();
 });
 
-var mapsHandler = Handler(
+var remarkHandler = Handler(
     handlerFunc: (BuildContext? context, Map<String, List<String>> params) {
-  return Maps();
+  final args = context?.settings?.arguments as Map;
+  return Remark(
+    userID: args['userID'],
+  );
 });

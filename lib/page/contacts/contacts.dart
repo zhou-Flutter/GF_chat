@@ -59,7 +59,16 @@ class _ContactsState extends State<Contacts> {
   @override
   void initState() {
     super.initState();
-    friendList = Provider.of<Friend>(context, listen: false).friendList;
+    // friendList = Provider.of<Friend>(context, listen: false).friendList;
+    // //修改备注 刷新
+    // eventBus.on<NoticeEvent>().listen((event) {
+    //   if (mounted) {
+    //     if (event.notice == Notice.remark) {
+    //       friendList = Provider.of<Friend>(context, listen: false).friendList;
+    //       setState(() {});
+    //     }
+    //   }
+    // });
   }
 
   //跳转页面
@@ -73,8 +82,11 @@ class _ContactsState extends State<Contacts> {
         );
         break;
       case 2:
-        Provider.of<Friend>(context, listen: false).getJoinedGroupList(context);
-
+        Application.router.navigateTo(
+          context,
+          "/groupList",
+          transition: TransitionType.inFromRight,
+        );
         break;
       case 3:
         Application.router.navigateTo(
@@ -91,6 +103,8 @@ class _ContactsState extends State<Contacts> {
   Widget build(BuildContext context) {
     itemList[0]["unread"] =
         context.watch<Friend>().friendApplicationUnreadCount;
+    friendList = context.watch<Friend>().friendList;
+
     return Scaffold(
       backgroundColor: Colors.white,
       appBar: AppBar(

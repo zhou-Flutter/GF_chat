@@ -64,7 +64,7 @@ android {
         manifestPlaceholders = [
                 TENCENT_APP_ID: "102005320",//腾讯QQ AppId
                 PUSH_PKGNAME : applicationId,
-			    JPUSH_APPKEY : "d0443639315b0672ff9e161b", // NOTE: JPush 上注册的包名对应的 Appkey.
+			    JPUSH_APPKEY : "e3cc74a5b17b41296a2f9b6d", // NOTE: JPush 上注册的包名对应的 Appkey.
 			    JPUSH_CHANNEL : "developer-default", //暂时填写默认值即可.
         ]
     }
@@ -95,13 +95,6 @@ flutter {
 }
 
 dependencies {
-    implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk7:$kotlin_version"
-    compile fileTree(dir: 'libs', include: ['*.jar'])
-    //3D地图so及jar
-    compile 'com.amap.api:3dmap:latest.integration'
-    //定位功能
-    compile 'com.amap.api:location:latest.integration'
-    //搜索功能
-    compile 'com.amap.api:search:latest.integration'
+    implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk7:$kotlin_version" 
 
 }

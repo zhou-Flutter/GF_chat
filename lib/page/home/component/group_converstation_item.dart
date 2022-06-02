@@ -81,7 +81,8 @@ class _GroupConverItemState extends State<GroupConverItem> {
                       widget.conversation.showName!,
                       overflow: TextOverflow.ellipsis,
                       style: TextStyle(
-                        fontSize: 35.sp,
+                        fontSize: 30.sp,
+                        fontWeight: FontWeight.w500,
                       ),
                     ),
                   ),

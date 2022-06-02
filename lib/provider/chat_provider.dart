@@ -261,10 +261,15 @@ class Chat with ChangeNotifier {
 
   //设置草稿箱
   setConversationDraft(conversationID, draftText) async {
-    await TencentImSDKPlugin.v2TIMManager
+    V2TimCallback res = await TencentImSDKPlugin.v2TIMManager
         .getConversationManager()
         .setConversationDraft(
             conversationID: conversationID, draftText: draftText);
+
+    if (res.code == 0) {
+    } else {
+      ErrorTips.errorMsg(res.code);
+    }
   }
 
   //设置本地消息 用来设置语音 红点未读
@@ -281,7 +286,7 @@ class Chat with ChangeNotifier {
   }
 
   //获取单聊消息 最新的20条
-  getC2CMsgList(userID, showName, context) async {
+  getC2CMsgList(userID, context) async {
     _c2CMsgList = [];
     V2TimValueCallback<List<V2TimMessage>> res = await TencentImSDKPlugin
         .v2TIMManager
@@ -302,7 +307,6 @@ class Chat with ChangeNotifier {
         routeSettings: RouteSettings(
           arguments: {
             "userID": userID,
-            "showName": showName,
           },
         ),
       );
@@ -463,14 +467,20 @@ class Chat with ChangeNotifier {
   }
 
   ///获取 指定 会话的信息 "c2c_$conversationID"
-  getConversation(conversationID) async {
+  static Future<V2TimConversation?> getConversationInfo(
+      bool isGroup, converID) async {
+    var conversationID = "";
+    if (isGroup) {
+      conversationID = "group_$converID";
+    } else {
+      conversationID = "c2c_$converID";
+    }
     V2TimValueCallback<V2TimConversation> res = await TencentImSDKPlugin
         .v2TIMManager
         .getConversationManager()
         .getConversation(conversationID: conversationID);
-    if (res.data != null) {
-      _v2timConversation = res.data;
-      notifyListeners();
+    if (res.code == 0) {
+      return res.data;
     }
   }
 

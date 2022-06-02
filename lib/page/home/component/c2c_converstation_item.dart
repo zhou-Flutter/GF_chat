@@ -38,7 +38,7 @@ class _C2cConverItemState extends State<C2cConverItem> {
   //页面跳转
   _onTap(V2TimConversation item) {
     Provider.of<Chat>(context, listen: false)
-        .getC2CMsgList(item.userID, item.showName, context);
+        .getC2CMsgList(item.userID, context);
   }
 
   @override
@@ -71,7 +71,8 @@ class _C2cConverItemState extends State<C2cConverItem> {
                       "${item!.showName}",
                       overflow: TextOverflow.ellipsis,
                       style: TextStyle(
-                        fontSize: 35.sp,
+                        fontSize: 30.sp,
+                        fontWeight: FontWeight.w500,
                       ),
                     ),
                   ),

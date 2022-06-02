@@ -65,4 +65,5 @@ class NoticeEvent {
 
 enum Notice {
   voicePage, //通话界面
+  remark, //修改好友备注进行通知
 }

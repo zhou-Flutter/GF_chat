@@ -18,7 +18,7 @@ class Personal extends StatefulWidget {
 }
 
 class _PersonalState extends State<Personal> {
-  List<V2TimUserFullInfo> selfInfo = [];
+  V2TimUserFullInfo? selfInfo;
   var isshow = true;
   final List _list = [
     {
@@ -59,7 +59,7 @@ class _PersonalState extends State<Personal> {
       appBar: AppBar(),
       body: Column(
         children: [
-          selfInfo.isEmpty ? Container() : hander(selfInfo[0]),
+          hander(),
           SizedBox(height: 30.h),
           toolItem(),
           SizedBox(height: 30.h),
@@ -70,7 +70,7 @@ class _PersonalState extends State<Personal> {
   }
 
   // 头部信息
-  Widget hander(V2TimUserFullInfo info) {
+  Widget hander() {
     return InkWell(
       onTap: () {
         Application.router.navigateTo(
@@ -91,7 +91,7 @@ class _PersonalState extends State<Personal> {
               child: ClipRRect(
                 borderRadius: BorderRadius.circular(10), //弧度
                 child: Image.network(
-                  info.faceUrl!,
+                  selfInfo!.faceUrl!,
                   fit: BoxFit.fill,
                 ),
               ),
@@ -104,7 +104,7 @@ class _PersonalState extends State<Personal> {
                   Container(
                     padding: EdgeInsets.only(bottom: 20.r),
                     child: Text(
-                      "${info.nickName}",
+                      "${selfInfo!.nickName}",
                       overflow: TextOverflow.ellipsis,
                       style: TextStyle(
                         fontSize: 50.sp,
@@ -115,7 +115,7 @@ class _PersonalState extends State<Personal> {
                   Container(
                     padding: EdgeInsets.only(bottom: 10.r),
                     child: Text(
-                      "ID:${info.userID}",
+                      "ID:${selfInfo!.userID}",
                       overflow: TextOverflow.ellipsis,
                       style: TextStyle(
                         color: Colors.black38,
@@ -124,14 +124,57 @@ class _PersonalState extends State<Personal> {
                     ),
                   ),
                   Container(
-                    padding: EdgeInsets.only(bottom: 20.r),
-                    child: Text(
-                      "签名: 暂无设置签名",
-                      overflow: TextOverflow.ellipsis,
-                      style: TextStyle(
-                        color: Colors.black38,
-                        fontSize: 28.sp,
-                      ),
+                    padding: EdgeInsets.only(bottom: 20.r, top: 10.r),
+                    child: Row(
+                      children: [
+                        Container(
+                          // width: 100.w,
+                          height: 40.r,
+                          padding: EdgeInsets.only(
+                            right: 10.r,
+                            left: 5.r,
+                            top: 2.r,
+                            bottom: 2.r,
+                          ),
+                          decoration: BoxDecoration(
+                            border: Border.all(color: Colors.black12, width: 1),
+                            borderRadius: BorderRadius.circular(20.r),
+                          ),
+                          child: Row(
+                            children: [
+                              Icon(
+                                Icons.add,
+                                color: Colors.black45,
+                                size: 25.sp,
+                              ),
+                              SizedBox(width: 3.r),
+                              Text(
+                                "状态",
+                                style: TextStyle(
+                                  color: Colors.black45,
+                                  fontSize: 20.sp,
+                                  fontWeight: FontWeight.w500,
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                        SizedBox(width: 20.r),
+                        Container(
+                          width: 37.r,
+                          height: 37.r,
+                          decoration: BoxDecoration(
+                            border:
+                                Border.all(color: Colors.black26, width: 1.r),
+                            borderRadius: BorderRadius.circular(50.r),
+                          ),
+                          child: Icon(
+                            Icons.more_horiz,
+                            size: 30.sp,
+                            color: Colors.black45,
+                          ),
+                        )
+                      ],
                     ),
                   ),
                 ],
@@ -145,7 +188,14 @@ class _PersonalState extends State<Personal> {
                     IconData(0xe601, fontFamily: "icons"),
                     size: 30.r,
                   ),
-                )
+                ),
+                Container(
+                  padding: EdgeInsets.only(top: 80.r, left: 10),
+                  child: Icon(
+                    Icons.chevron_right,
+                    color: Colors.black54,
+                  ),
+                ),
               ],
             )
           ],

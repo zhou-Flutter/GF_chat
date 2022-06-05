@@ -16,8 +16,9 @@ import 'package:provider/provider.dart';
 import 'package:tencent_im_sdk_plugin/models/v2_tim_conversation.dart';
 import 'package:tencent_im_sdk_plugin/models/v2_tim_value_callback.dart';
 import 'package:tencent_im_sdk_plugin/tencent_im_sdk_plugin.dart';
-import 'package:text_span_field/text_span_builder.dart';
-import 'package:text_span_field/text_span_field.dart';
+import 'package:text_span_field_null_safety/text_span_builder.dart';
+
+import 'package:text_span_field_null_safety/text_span_field.dart';
 
 late StreamSubscription<bool> keyboardSubscription;
 

@@ -8,7 +8,7 @@ import 'package:my_chat/provider/common_provider.dart';
 import 'package:my_chat/utils/color_tools.dart';
 import 'package:my_chat/utils/commons.dart';
 import 'package:provider/src/provider.dart';
-import 'package:text_span_field/text_span_builder.dart';
+import 'package:text_span_field_null_safety/text_span_builder.dart';
 
 class EmoTicon extends StatefulWidget {
   String converID;
@@ -127,126 +127,154 @@ class _EmoTiconState extends State<EmoTicon>
 
   //系统经典表情包
   Widget classicEmo() {
-    return Container(
-      color: HexColor.fromHex('#EDEDED'),
-      child: SingleChildScrollView(
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            latelyEmo.isEmpty
-                ? Container()
-                : Container(
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Container(
-                          padding: EdgeInsets.only(left: 40.r, top: 20.r),
-                          child: Text(
-                            "最近使用",
-                            style: TextStyle(
-                              color: Colors.black45,
-                              fontSize: 20.sp,
-                              fontWeight: FontWeight.w500,
+    return Stack(
+      children: [
+        Container(
+          color: HexColor.fromHex('#EDEDED'),
+          child: SingleChildScrollView(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                latelyEmo.isEmpty
+                    ? Container()
+                    : Container(
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Container(
+                              padding: EdgeInsets.only(left: 40.r, top: 20.r),
+                              child: Text(
+                                "最近使用",
+                                style: TextStyle(
+                                  color: Colors.black45,
+                                  fontSize: 20.sp,
+                                  fontWeight: FontWeight.w500,
+                                ),
+                              ),
                             ),
-                          ),
-                        ),
-                        GridView.custom(
-                          padding: EdgeInsets.symmetric(horizontal: 20.r),
-                          shrinkWrap: true,
-                          physics: const NeverScrollableScrollPhysics(),
-                          gridDelegate:
-                              const SliverGridDelegateWithFixedCrossAxisCount(
-                            crossAxisCount: 8,
-                            mainAxisSpacing: 0.0,
-                            crossAxisSpacing: 5.0,
-                          ),
-                          childrenDelegate: SliverChildBuilderDelegate(
-                            (context, index) {
-                              return TextButton(
-                                style: ButtonStyle(
-                                  overlayColor:
-                                      MaterialStateProperty.all<Color>(
-                                          Colors.transparent), //splashColor
-                                  padding: MaterialStateProperty.all<
-                                      EdgeInsetsGeometry>(EdgeInsets.all(0)),
-                                  backgroundColor:
-                                      MaterialStateProperty.resolveWith(
-                                          (states) {
-                                    //设置按下时的背景颜色
-                                    if (states
-                                        .contains(MaterialState.pressed)) {
-                                      return Colors.black12;
-                                    }
-                                    //默认不使用背景颜色
-                                    return null;
-                                  }),
-                                ),
-                                onPressed: () {
-                                  widget.textSpanBuilder.appendTextToCursor(
+                            GridView.custom(
+                              padding: EdgeInsets.symmetric(horizontal: 20.r),
+                              shrinkWrap: true,
+                              physics: const NeverScrollableScrollPhysics(),
+                              gridDelegate:
+                                  const SliverGridDelegateWithFixedCrossAxisCount(
+                                crossAxisCount: 8,
+                                mainAxisSpacing: 0.0,
+                                crossAxisSpacing: 5.0,
+                              ),
+                              childrenDelegate: SliverChildBuilderDelegate(
+                                (context, index) {
+                                  return TextButton(
+                                    style: ButtonStyle(
+                                      overlayColor:
+                                          MaterialStateProperty.all<Color>(
+                                              Colors.transparent), //splashColor
+                                      padding: MaterialStateProperty.all<
+                                              EdgeInsetsGeometry>(
+                                          EdgeInsets.all(0)),
+                                      backgroundColor:
+                                          MaterialStateProperty.resolveWith(
+                                              (states) {
+                                        //设置按下时的背景颜色
+                                        if (states
+                                            .contains(MaterialState.pressed)) {
+                                          return Colors.black12;
+                                        }
+                                        //默认不使用背景颜色
+                                        return null;
+                                      }),
+                                    ),
+                                    onPressed: () {
+                                      widget.textSpanBuilder.appendTextToCursor(
+                                          String.fromCharCode(
+                                              emoList[index]["unicode"]));
+                                      Provider.of<Common>(context,
+                                              listen: false)
+                                          .savelatelyEmo(emoList[index]);
+                                    },
+                                    child: Text(
                                       String.fromCharCode(
-                                          emoList[index]["unicode"]));
-                                  Provider.of<Common>(context, listen: false)
-                                      .savelatelyEmo(emoList[index]);
+                                          emoList[index]["unicode"]),
+                                      style: TextStyle(fontSize: 50.sp),
+                                    ),
+                                  );
                                 },
-                                child: Text(
-                                  String.fromCharCode(
-                                      emoList[index]["unicode"]),
-                                  style: TextStyle(fontSize: 50.sp),
-                                ),
-                              );
-                            },
-                            childCount: 8,
-                          ),
+                                childCount: 8,
+                              ),
+                            ),
+                          ],
                         ),
-                      ],
+                      ),
+                Container(
+                  padding: EdgeInsets.only(left: 40.r, top: 20.r),
+                  child: Text(
+                    "所有表情",
+                    style: TextStyle(
+                      color: Colors.black45,
+                      fontSize: 20.sp,
+                      fontWeight: FontWeight.w500,
                     ),
                   ),
-            Container(
-              padding: EdgeInsets.only(left: 40.r, top: 20.r),
-              child: Text(
-                "所有表情",
-                style: TextStyle(
-                  color: Colors.black45,
-                  fontSize: 20.sp,
-                  fontWeight: FontWeight.w500,
                 ),
-              ),
-            ),
-            GridView.builder(
-              cacheExtent: 500,
-              padding: EdgeInsets.symmetric(horizontal: 20.r),
-              shrinkWrap: true,
-              physics: const NeverScrollableScrollPhysics(),
-              gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-                crossAxisCount: 8,
-                mainAxisSpacing: 0.0,
-                crossAxisSpacing: 5.0,
-              ),
-              itemCount: emoList.length,
-              itemBuilder: ((context, index) {
-                return CustomTap(
-                  bgColor: HexColor.fromHex('#EDEDED'),
-                  tapColor: HexColor.fromHex('#f5f5f5'),
-                  radius: 20.r,
-                  onTap: () {
-                    widget.textSpanBuilder.appendTextToCursor(
-                        String.fromCharCode(emoList[index]["unicode"]));
-                    Provider.of<Common>(context, listen: false)
-                        .savelatelyEmo(emoList[index]);
-                  },
-                  child: Container(
-                    alignment: Alignment.center,
-                    child: Text(
-                      String.fromCharCode(emoList[index]["unicode"]),
-                      style: TextStyle(fontSize: 50.sp),
-                    ),
+                GridView.builder(
+                  cacheExtent: 500,
+                  padding: EdgeInsets.symmetric(horizontal: 20.r),
+                  shrinkWrap: true,
+                  physics: const NeverScrollableScrollPhysics(),
+                  gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+                    crossAxisCount: 8,
+                    mainAxisSpacing: 0.0,
+                    crossAxisSpacing: 5.0,
                   ),
-                );
-              }),
+                  itemCount: emoList.length,
+                  itemBuilder: ((context, index) {
+                    return CustomTap(
+                      bgColor: HexColor.fromHex('#EDEDED'),
+                      tapColor: HexColor.fromHex('#f5f5f5'),
+                      radius: 20.r,
+                      onTap: () {
+                        widget.textSpanBuilder.appendTextToCursor(
+                            String.fromCharCode(emoList[index]["unicode"]));
+                        Provider.of<Common>(context, listen: false)
+                            .savelatelyEmo(emoList[index]);
+                      },
+                      child: Container(
+                        alignment: Alignment.center,
+                        child: Text(
+                          String.fromCharCode(emoList[index]["unicode"]),
+                          style: TextStyle(fontSize: 50.sp),
+                        ),
+                      ),
+                    );
+                  }),
+                ),
+              ],
             ),
-          ],
+          ),
         ),
-      ),
+        Positioned(
+          bottom: 0,
+          right: 0,
+          child: InkWell(
+            onTap: () {
+              widget.textSpanBuilder.customDelete();
+            },
+            child: Container(
+              margin: EdgeInsets.only(bottom: 25.r, right: 30.r),
+              padding: EdgeInsets.symmetric(horizontal: 25.r, vertical: 15.r),
+              decoration: BoxDecoration(
+                color: Colors.white,
+                borderRadius: BorderRadius.circular(10.r),
+              ),
+              child: Icon(
+                Icons.backspace_outlined,
+                size: 35.sp,
+                color: Colors.black38,
+              ),
+            ),
+          ),
+        )
+      ],
     );
   }
 

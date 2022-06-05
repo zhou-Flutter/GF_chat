@@ -119,7 +119,7 @@ packages:
       name: cupertino_icons
       url: "https://pub.flutter-io.cn"
     source: hosted
-    version: "1.0.4"
+    version: "1.0.5"
   custom_pop_up_menu:
     dependency: "direct main"
     description:
@@ -482,7 +482,7 @@ packages:
       name: nim_core
       url: "https://pub.flutter-io.cn"
     source: hosted
-    version: "1.0.0-rc.54"
+    version: "1.0.0-rc.56"
   nim_core_macos:
     dependency: transitive
     description:
@@ -838,12 +838,14 @@ packages:
       url: "https://pub.flutter-io.cn"
     source: hosted
     version: "0.4.2"
-  text_span_field:
+  text_span_field_null_safety:
     dependency: "direct main"
     description:
-      name: text_span_field
-      url: "https://pub.flutter-io.cn"
-    source: hosted
+      path: "."
+      ref: master
+      resolved-ref: "9fff06d3ec36b056020c2ea547772229ee963ac9"
+      url: "https://github.com/zhou-Flutter/text_span_field_null_safety.git"
+    source: git
     version: "2.0.8"
   typed_data:
     dependency: transitive

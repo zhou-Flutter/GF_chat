@@ -51,8 +51,6 @@ dependencies:
   flutter_easyrefresh: ^2.2.1
   # 事件总线
   event_bus: ^2.0.0
-  # 扩展输入框
-  text_span_field: ^2.0.8
   # 指定跳转
   url_launcher: ^6.0.20
   # 扩展Listview
@@ -107,18 +105,23 @@ dependencies:
   image_gallery_saver: ^1.7.1
   # 数据库
   sqflite: ^2.0.2
-  
-
-  #本地插件引用 极光插件
-  jverify:
-    path: plugins/jverify-flutter-plugin-master
 
   # # 扫描二维码
   # mobile_scanner: ^1.0.0
   # # 文件选择
   # file_picker: ^4.5.1
- 
+  
 
+  #本地插件引用 极光插件
+  jverify:
+    path: plugins/jverify-flutter-plugin-master
+  #自定义输入框
+  text_span_field_null_safety:
+    git:
+      url: https://github.com/zhou-Flutter/text_span_field_null_safety.git
+      ref: master
+
+  
   #本地化
   flutter_localizations:
     sdk: flutter

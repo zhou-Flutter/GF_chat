@@ -8,7 +8,8 @@ import 'package:loading_indicator/loading_indicator.dart';
 import 'package:my_chat/config/routes/application.dart';
 import 'package:my_chat/utils/color_tools.dart';
 import 'package:my_chat/utils/constant.dart';
-import 'package:pull_to_refresh/pull_to_refresh.dart' as refresh;
+import 'package:pull_to_refresh_flutter3/pull_to_refresh_flutter3.dart'
+    as refresh;
 
 class Commons {
   //下拉刷新的头部

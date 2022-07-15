@@ -153,11 +153,8 @@ class Trtc with ChangeNotifier {
     floatingOne = floatingManager.createFloating(
       "1",
       Floating(
-        MyChatApp.navigatorKey,
         FloatingWindow(),
         slideType: FloatingSlideType.onRightAndTop,
-        height: 80,
-        width: 80,
         top: 100,
         slideTopHeight: 50,
         isShowLog: false,
@@ -297,7 +294,7 @@ class Trtc with ChangeNotifier {
   //显示悬浮窗
   floatOpen() {
     if (_callStatus != CallStatus.nocall) {
-      floatingOne.open();
+      floatingOne.open(MyChatApp.navigatorKey.currentState!.context);
     }
   }
 

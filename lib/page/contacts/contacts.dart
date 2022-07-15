@@ -19,7 +19,7 @@ import 'package:my_chat/utils/color_tools.dart';
 import 'package:my_chat/utils/commons.dart';
 import 'package:my_chat/utils/event_bus.dart';
 import 'package:provider/provider.dart';
-import 'package:pull_to_refresh/pull_to_refresh.dart';
+import 'package:pull_to_refresh_flutter3/pull_to_refresh_flutter3.dart';
 import 'package:tencent_im_sdk_plugin/models/v2_tim_friend_info.dart';
 
 class Contacts extends StatefulWidget {

@@ -20,7 +20,7 @@ import 'package:my_chat/provider/trtc_provider.dart';
 import 'package:my_chat/utils/commons.dart';
 import 'package:my_chat/utils/locator.dart';
 import 'package:provider/provider.dart';
-import 'package:pull_to_refresh/pull_to_refresh.dart';
+import 'package:pull_to_refresh_flutter3/pull_to_refresh_flutter3.dart';
 import 'package:tencent_kit/tencent_kit.dart';
 
 const String _TENCENT_APPID = '102005320';
@@ -84,8 +84,10 @@ class _MyChatAppState extends State<MyChatApp> with WidgetsBindingObserver {
   @override
   Widget build(BuildContext context) {
     return ScreenUtilInit(
-      designSize: Size(750, 1334),
-      builder: () => MultiProvider(
+      designSize: const Size(750, 1334),
+      minTextAdapt: true,
+      splitScreenMode: true,
+      builder: (context, child) => MultiProvider(
         providers: [
           ChangeNotifierProvider(
             create: (_) => InitProvider(),

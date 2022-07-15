@@ -34,7 +34,7 @@ dependencies:
   #状态管理
   provider: ^6.0.2
   #屏幕适配
-  flutter_screenutil: 5.0.0+2
+  flutter_screenutil: ^5.5.3+2
   #路由导航
   fluro: ^2.0.3
   # 缓存
@@ -46,9 +46,9 @@ dependencies:
   #弹窗
   flutter_easyloading: ^3.0.3
   #下拉刷新
-  pull_to_refresh: ^2.0.0
+  pull_to_refresh_flutter3: ^2.0.1
   #下拉刷新
-  flutter_easyrefresh: ^2.2.1
+  flutter_easyrefresh: ^2.2.2
   # 事件总线
   event_bus: ^2.0.0
   # 指定跳转
@@ -58,7 +58,7 @@ dependencies:
   # 汉字转拼音
   lpinyin: ^2.0.3
   # 弹出菜单
-  custom_pop_up_menu: 1.2.2
+  custom_pop_up_menu: ^1.2.4
   # IM
   tencent_im_sdk_plugin: ^4.0.0
   # 腾讯云音视频
@@ -78,13 +78,13 @@ dependencies:
   # 电话号码输入框
   mask_text_input_formatter: ^2.3.0
   # # 图片缓存
-  cached_network_image: ^3.2.0
+  cached_network_image: ^3.2.1
   # 选择图片
   image_picker: ^0.8.5
   # 图片选择
   images_picker: ^1.2.11
   # 音频录制
-  flutter_sound: ^9.2.10
+  record: ^3.0.4
   # 文件路径
   path_provider: ^2.0.9
   # 权限
@@ -98,7 +98,7 @@ dependencies:
   # 查看图片
   photo_view: ^0.13.0
   # 悬浮窗
-  flutter_floating: ^0.0.1
+  flutter_floating: ^0.1.2
   # 生成二维码
   qr_flutter: ^4.0.0
   # 图片保存

@@ -4,7 +4,6 @@ import 'dart:io';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
-import 'package:flutter_sound/flutter_sound.dart';
 
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:my_chat/provider/chat_provider.dart';
@@ -15,7 +14,7 @@ import 'package:path_provider/path_provider.dart';
 import 'package:flutter/foundation.dart' show kIsWeb;
 import 'package:permission_handler/permission_handler.dart';
 import 'package:audio_session/audio_session.dart';
-import 'package:flutter_sound_platform_interface/flutter_sound_recorder_platform_interface.dart';
+import 'package:record/record.dart';
 import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:vibration/vibration.dart';
@@ -34,89 +33,23 @@ class Voice extends StatefulWidget {
 }
 
 class _VoiceState extends State<Voice> {
-  FlutterSoundRecorder? _mRecorder = FlutterSoundRecorder();
-  Codec _codec = Codec.aacMP4;
+  final record = Record();
   SoundState soundState = SoundState.nosta;
 
   Timer? _timer;
 
-  Timer? _timer1;
+  Timer? _timer2; //控制音浪计时器
+
+  var soundLv = 0; //音浪等级
 
   int duration = 0;
 
   bool istap = false; //按下状态
 
-  String soundPath = "tau_file.mp4"; //音频文件的位置
-
-  int? path = 0; //音频文件的位置 为了防止重名
-
-  int soundAnim = 0; //录音动画音浪
-
   @override
   void initState() {
     super.initState();
-
-    openTheRecorder().then((value) {});
   }
-
-  setSoundPathName(sound) async {
-    SharedPreferences prefs = await SharedPreferences.getInstance();
-    prefs.setInt("soundPathName", sound);
-  }
-
-  Future<void> openTheRecorder() async {
-    if (!kIsWeb) {
-      var status = await Permission.microphone.request();
-      if (status != PermissionStatus.granted) {
-        throw RecordingPermissionException('Microphone permission not granted');
-      }
-    }
-    await _mRecorder!.openRecorder();
-    if (!await _mRecorder!.isEncoderSupported(_codec) && kIsWeb) {
-      _codec = Codec.opusWebM;
-      // _mPath = 'tau_file.webm';
-      if (!await _mRecorder!.isEncoderSupported(_codec) && kIsWeb) {
-        // _mRecorderIsInited = true;
-        return;
-      }
-    }
-    final session = await AudioSession.instance;
-    await session.configure(AudioSessionConfiguration(
-      avAudioSessionCategory: AVAudioSessionCategory.playAndRecord,
-      avAudioSessionCategoryOptions:
-          AVAudioSessionCategoryOptions.allowBluetooth |
-              AVAudioSessionCategoryOptions.defaultToSpeaker,
-      avAudioSessionMode: AVAudioSessionMode.spokenAudio,
-      avAudioSessionRouteSharingPolicy:
-          AVAudioSessionRouteSharingPolicy.defaultPolicy,
-      avAudioSessionSetActiveOptions: AVAudioSessionSetActiveOptions.none,
-      androidAudioAttributes: const AndroidAudioAttributes(
-        contentType: AndroidAudioContentType.speech,
-        flags: AndroidAudioFlags.none,
-        usage: AndroidAudioUsage.voiceCommunication,
-      ),
-      androidAudioFocusGainType: AndroidAudioFocusGainType.gain,
-      androidWillPauseWhenDucked: true,
-    ));
-
-    // _mRecorderIsInited = true;
-  }
-
-  // Future<void> openTheRecorder() async {
-  //   var status = await Permission.microphone.request();
-  //   if (status != PermissionStatus.granted) {
-  //     throw RecordingPermissionException('Microphone permission not granted');
-  //   }
-  //   await _mRecorder!.openRecorder();
-
-  //   if (!await _mRecorder!.isEncoderSupported(_codec) && kIsWeb) {
-  //     _codec = Codec.opusWebM;
-  //     soundPath = 'tau_file.webm';
-  //     if (!await _mRecorder!.isEncoderSupported(_codec) && kIsWeb) {
-  //       return;
-  //     }
-  //   }
-  // }
 
   //计时器
   void timer() async {
@@ -130,64 +63,106 @@ class _VoiceState extends State<Voice> {
     );
   }
 
+  ///音浪计时器 获取音浪大小
+  timer2() async {
+    _timer2 =
+        Timer.periodic(const Duration(milliseconds: 100), (Timer t) async {
+      Amplitude? _amplitude = await record.getAmplitude();
+      print(" current: ${_amplitude.current}");
+      var sound = -(_amplitude.current);
+      if (sound > 45) {
+        soundLv = 0;
+      } else if (45 > sound && sound > 40) {
+        soundLv = 1;
+      } else if (40 > sound && sound > 35) {
+        soundLv = 2;
+      } else if (35 > sound && sound > 30) {
+        soundLv = 3;
+      } else if (30 > sound && sound > 25) {
+        soundLv = 4;
+      } else if (25 > sound && sound > 20) {
+        soundLv = 5;
+      } else if (20 > sound && sound > 15) {
+        soundLv = 6;
+      } else if (15 > sound && sound > 10) {
+        soundLv = 7;
+      } else if (10 > sound && sound > 5) {
+        soundLv = 8;
+      } else if (sound < 5) {
+        soundLv = 9;
+      }
+      setState(() {});
+    });
+  }
+
   //开始录音
   starSound() async {
-    path = Provider.of<Common>(context, listen: false).soundPathName;
-    soundPath = "tau_file$path.mp4"; //音频文件的位置
-    soundState = SoundState.sound;
-    istap = true;
-    setState(() {});
-    record();
-    timer();
+    if (await record.hasPermission()) {
+      soundState = SoundState.sound;
+      istap = true;
+      setState(() {});
+      timer2();
+      timer();
+      await record
+          .start(
+            encoder: AudioEncoder.AAC_LD,
+            bitRate: 128000,
+            samplingRate: 44100,
+          )
+          .then((value) {})
+          .onError((error, stackTrace) {
+        Fluttertoast.showToast(msg: "语音录制出错");
+        recoverState();
+      });
+      ;
+    } else {
+      Fluttertoast.showToast(msg: "请在设置中授予录音权限");
+      recoverState();
+    }
   }
 
   //发送语音
   sendSound(SoundState sound) async {
-    await _mRecorder!.stopRecorder().then((value) {
-      Provider.of<Common>(context, listen: false).setSoundPathName(path);
-      String sendUrl = value!;
-      _timer!.cancel();
-      switch (sound) {
-        case SoundState.sound:
-          if (duration < 1) {
-            Fluttertoast.showToast(msg: "说话时间太短");
-          } else {
-            print("发送语音");
-
-            Provider.of<Chat>(context, listen: false).createSoundMsg(
-                sendUrl, duration, widget.converID, widget.isGroup);
+    bool isRecording = await record.isRecording();
+    if (duration > 1) {
+      if (isRecording) {
+        var path = await record.stop();
+        if (path != null) {
+          switch (sound) {
+            case SoundState.sound:
+              Provider.of<Chat>(context, listen: false).createSoundMsg(
+                  path, duration, widget.converID, widget.isGroup);
+              break;
+            case SoundState.cancel:
+              Fluttertoast.showToast(msg: "取消语音发送");
+              break;
+            case SoundState.text:
+              Fluttertoast.showToast(msg: "该版本暂不支持转文字");
+              break;
+            default:
           }
-          break;
-        case SoundState.cancel:
-          Fluttertoast.showToast(msg: "取消语音发送");
-          break;
-        case SoundState.text:
-          Fluttertoast.showToast(msg: "该版本暂不支持转文字");
-          break;
-        default:
+        }
+      } else {
+        print("没有录制");
       }
-      duration = 0;
-      soundState = SoundState.nosta;
-      istap = false;
-      setState(() {});
-    });
+    } else {
+      Fluttertoast.showToast(msg: "说话时间太短");
+    }
+    recoverState();
   }
 
-  //开始录制
-  void record() {
-    _mRecorder!
-        .startRecorder(
-            toFile: soundPath,
-            codec: _codec,
-            audioSource: AudioSource.microphone)
-        .then((value) {
-      setState(() {});
-    });
+  //恢复录制前的状态
+  recoverState() {
+    duration = 0;
+    soundState = SoundState.nosta;
+    istap = false;
+    _timer2?.cancel();
+    _timer?.cancel();
+    setState(() {});
   }
 
   @override
   void dispose() {
-    _mRecorder!.closeRecorder();
     super.dispose();
   }
 
@@ -218,13 +193,11 @@ class _VoiceState extends State<Voice> {
             child: GestureDetector(
               onTapDown: (e) async {
                 starSound();
-                timer1();
                 Vibration.vibrate(duration: 50);
               },
               onTapUp: (e) {
+                print("抬手");
                 sendSound(soundState);
-                _timer1!.cancel();
-                soundAnim = 0;
               },
               onHorizontalDragUpdate: (e) {
                 if (e.localPosition.dx < -43) {
@@ -240,9 +213,6 @@ class _VoiceState extends State<Voice> {
               },
               onHorizontalDragEnd: (e) {
                 sendSound(soundState);
-
-                _timer1!.cancel();
-                soundAnim = 0;
               },
               child: Container(
                 height: 180.r,
@@ -290,7 +260,7 @@ class _VoiceState extends State<Voice> {
           Row(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
-              soundAnimation(TextDirection.ltr),
+              soundView(TextDirection.rtl),
               Container(
                 padding: EdgeInsets.symmetric(horizontal: 10.r),
                 child: Text(
@@ -301,7 +271,7 @@ class _VoiceState extends State<Voice> {
                   ),
                 ),
               ),
-              soundAnimation(TextDirection.rtl),
+              soundView(TextDirection.ltr),
             ],
           ),
           Container(
@@ -365,79 +335,26 @@ class _VoiceState extends State<Voice> {
     );
   }
 
-  //计时器 控制音频喇叭
-  timer1() async {
-    _timer1 = Timer.periodic(
-      const Duration(milliseconds: 600),
-      (_timer1) => {
-        setState(() {
-          soundAnim++;
-          if (soundAnim == 4) {
-            soundAnim = 1;
-          }
-        })
-      },
-    );
-  }
-
-  //录音动画
-  Widget soundAnimation(TextDirection textDirection) {
-    switch (soundAnim) {
-      case 0:
-        return Row(
-          mainAxisAlignment: MainAxisAlignment.center,
-          textDirection: textDirection,
-          children: [
-            item(Colors.black26),
-            item(Colors.black26),
-            item(Colors.blue),
-          ],
-        );
-      case 1:
-        return Row(
-          mainAxisAlignment: MainAxisAlignment.center,
-          textDirection: textDirection,
-          children: [
-            item(Colors.black26),
-            item(Colors.black26),
-            item(Colors.blue),
-          ],
-        );
-      case 2:
-        return Row(
-          mainAxisAlignment: MainAxisAlignment.center,
-          textDirection: textDirection,
-          children: [
-            item(Colors.black26),
-            item(Colors.blue),
-            item(Colors.blue),
-          ],
-        );
-      case 3:
-        return Row(
-          mainAxisAlignment: MainAxisAlignment.center,
-          textDirection: textDirection,
-          children: [
-            item(Colors.blue),
-            item(Colors.blue),
-            item(Colors.blue),
-          ],
-        );
-      default:
-        return Container();
+  //音浪动画
+  Widget soundView(textDirection) {
+    List<Widget> list = [];
+    for (int i = 0; i <= 9; i++) {
+      var item = Container(
+        margin: EdgeInsets.all(3),
+        height: 18,
+        width: 3,
+        decoration: BoxDecoration(
+          color: soundLv >= i ? Colors.green : Colors.black12,
+          borderRadius: BorderRadius.circular(5),
+        ),
+      );
+      list.add(item);
     }
-  }
-
-  // 录音动画item
-  Widget item(Color color) {
     return Container(
-      margin: EdgeInsets.all(5.r),
-      decoration: BoxDecoration(
-        color: color,
-        borderRadius: BorderRadius.circular(5.r),
+      child: Row(
+        textDirection: textDirection,
+        children: list,
       ),
-      height: 15.h,
-      width: 5.w,
     );
   }
 }

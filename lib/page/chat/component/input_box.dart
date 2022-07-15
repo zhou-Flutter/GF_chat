@@ -95,7 +95,7 @@ class _ButtonInputBoxState extends State<ButtonInputBox>
     super.initState();
 
     //初始化 监听
-    WidgetsBinding.instance!.addObserver(this);
+    WidgetsBinding.instance.addObserver(this);
 
     //关闭键盘
     eventBus.on<CloseButtonKeyEvent>().listen((event) {
@@ -142,7 +142,7 @@ class _ButtonInputBoxState extends State<ButtonInputBox>
   void didChangeMetrics() {
     super.didChangeMetrics();
 
-    WidgetsBinding.instance!.addPostFrameCallback((de) {
+    WidgetsBinding.instance.addPostFrameCallback((de) {
       setState(() {
         if (MediaQuery.of(context).viewInsets.bottom < 30) {
           //关闭键盘
@@ -179,7 +179,7 @@ class _ButtonInputBoxState extends State<ButtonInputBox>
   @override
   void dispose() {
     // keyboardSubscription.cancel();
-    WidgetsBinding.instance!.removeObserver(this);
+    WidgetsBinding.instance.removeObserver(this);
     super.dispose();
   }
 

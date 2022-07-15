@@ -34,7 +34,7 @@ void main() {
     WidgetsFlutterBinding.ensureInitialized();
     Tencent.instance.setIsPermissionGranted(granted: true);
     Tencent.instance.registerApp(appId: _TENCENT_APPID); //腾讯QQ 登录
-    GestureBinding.instance?.resamplingEnabled = true; //重采样 ，是触摸平滑
+    GestureBinding.instance.resamplingEnabled = true; //重采样 ，是触摸平滑
     SystemChrome.setPreferredOrientations(
         [DeviceOrientation.portraitUp, DeviceOrientation.portraitDown]);
     runApp(MyChatApp());

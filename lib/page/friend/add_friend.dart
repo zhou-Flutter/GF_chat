@@ -56,13 +56,13 @@ class _AddFriendPageState extends State<AddFriendPage>
     super.initState();
 
     //初始化 键盘监听
-    WidgetsBinding.instance!.addObserver(this);
+    WidgetsBinding.instance.addObserver(this);
   }
 
   @override
   void didChangeMetrics() {
     super.didChangeMetrics();
-    WidgetsBinding.instance!.addPostFrameCallback((_) {
+    WidgetsBinding.instance.addPostFrameCallback((_) {
       if (mounted) {
         setState(() {
           if (MediaQuery.of(context).viewInsets.bottom == 0) {

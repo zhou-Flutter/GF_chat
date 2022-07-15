@@ -35,7 +35,7 @@ class _SplashState extends State<Splash> with WidgetsBindingObserver {
     Provider.of<Common>(context, listen: false).getEmojiList(context);
     Provider.of<Common>(context, listen: false).getEmojiList(context);
     Provider.of<Common>(context, listen: false).getlatelyEmo(context);
-    WidgetsBinding.instance!.addObserver(this);
+    WidgetsBinding.instance.addObserver(this);
   }
 
   _isShowDialog() async {
@@ -49,7 +49,7 @@ class _SplashState extends State<Splash> with WidgetsBindingObserver {
 
   @override
   Widget build(BuildContext context) {
-    WidgetsBinding.instance!.addPostFrameCallback((mag) {
+    WidgetsBinding.instance.addPostFrameCallback((mag) {
       //渲染完毕执行
       _isShowDialog();
     });

@@ -46,13 +46,13 @@ class _CreateGroupState extends State<CreateGroup> with WidgetsBindingObserver {
     super.initState();
     friendList = Provider.of<Friend>(context, listen: false).friendList;
     //初始化 键盘监听
-    WidgetsBinding.instance!.addObserver(this);
+    WidgetsBinding.instance.addObserver(this);
   }
 
   @override
   void didChangeMetrics() {
     super.didChangeMetrics();
-    WidgetsBinding.instance!.addPostFrameCallback((_) {
+    WidgetsBinding.instance.addPostFrameCallback((_) {
       setState(() {
         if (MediaQuery.of(context).viewInsets.bottom == 0) {
         } else {
